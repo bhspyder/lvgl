@@ -78,6 +78,8 @@ extern "C" {
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
 
+#include "src/xml/lv_xml.h"
+
 #include "src/others/snapshot/lv_snapshot.h"
 #include "src/others/sysmon/lv_sysmon.h"
 #include "src/others/monkey/lv_monkey.h"
@@ -101,6 +103,7 @@ extern "C" {
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
+#include "src/libs/yxml/yxml.h"
 
 #include "src/layouts/lv_layout.h"
 
