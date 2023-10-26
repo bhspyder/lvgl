@@ -15,14 +15,11 @@
 // TODO:
 // * Implement elements and attributes
 // * Deal with const discard warnings
-// * Deal with case sensitivity (allow upper or lower?)
 // * Figure out meta elements (lvgl, resources, include, etc) and validate content
-// * Figure out best way to deal with multiple words in attribute values (top-mid or top mid)
 // * Add support for variables
-// * Make flexible when it comes to widget tags (btn button Button) or (obj object Object)
 // * Benchmark parser
 
-static const lv_xml_element_t *elements[] =
+const lv_xml_element_t *elements[] =
 {
     &lv_xml_obj_element,
     &lv_xml_btn_element,

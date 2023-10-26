@@ -1,7 +1,6 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 
-#include "lvgl/lvgl.h"
 #include "lv_xml_obj.h"
 
 static void apply_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);

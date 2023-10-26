@@ -3,6 +3,6 @@
 
 #include "lv_xml_element.h"
 
-const lv_xml_element_t lv_xml_obj_element;
+extern const lv_xml_element_t lv_xml_obj_element;
 
 #endif
