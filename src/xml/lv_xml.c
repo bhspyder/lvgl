@@ -158,6 +158,10 @@ lv_obj_t *lv_xml_inflate(const char *path)
     if(r < 0)
     { return NULL; }
 
+    free(xml);
+    free(attribute_value);
+    free(x);
+
     //Return root object
     return current_obj;
 }

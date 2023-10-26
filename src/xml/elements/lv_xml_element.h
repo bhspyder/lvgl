@@ -14,7 +14,7 @@ typedef struct lv_xml_element_t
 {
     struct lv_xml_element_t *base;
     char *name;
-    lv_obj_class_t *obj_class;
+    const lv_obj_class_t *obj_class;
     lv_xml_attribute_t *attributes;
     size_t attributes_count;
 } lv_xml_element_t;

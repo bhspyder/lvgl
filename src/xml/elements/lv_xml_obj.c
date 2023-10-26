@@ -32,35 +32,35 @@ static const lv_xml_attribute_t attributes[] =
     {.name = "ext-click-area", .apply_cb = apply_ext_click_area},
 
     //Flags
-    {.name = "hidden", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_HIDDEN },
-    {.name = "clickable", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_CLICKABLE },
-    {.name = "click-focusable", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_CLICK_FOCUSABLE },
-    {.name = "checkable", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_CHECKABLE },
-    {.name = "scrollable", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLLABLE },
-    {.name = "scroll-elastic", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_ELASTIC },
-    {.name = "scroll-momentum", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_MOMENTUM },
-    {.name = "scroll-one", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_ONE },
-    {.name = "scroll-chain-x", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_CHAIN_HOR },
-    {.name = "scroll-chain-y", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_CHAIN_VER },
-    {.name = "scroll-chain", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_CHAIN },
-    {.name = "scroll-on-focus", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_ON_FOCUS },
-    {.name = "scroll-with-arrow", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SCROLL_WITH_ARROW },
-    {.name = "snappable", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_SNAPPABLE },
-    {.name = "press-lock", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_PRESS_LOCK },
-    {.name = "event-bubble", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_EVENT_BUBBLE },
-    {.name = "gesture-bubble", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_GESTURE_BUBBLE },
-    {.name = "advanced-hit-test", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_ADV_HITTEST },
-    {.name = "ignore-layout", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_IGNORE_LAYOUT },
-    {.name = "floating", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_FLOATING },
-    {.name = "overflow-visible", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_OVERFLOW_VISIBLE },
-    {.name = "layout-1", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_LAYOUT_1 },
-    {.name = "layoyt-2", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_LAYOUT_2 },
-    {.name = "widget-1", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_WIDGET_1 },
-    {.name = "widget-2", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_WIDGET_2 },
-    {.name = "user-1", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_USER_1 },
-    {.name = "user-2", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_USER_2 },
-    {.name = "user-3", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_USER_3 },
-    {.name = "user-4", .apply_cb = apply_flag, .context = LV_OBJ_FLAG_USER_4 },
+    {.name = "hidden", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_HIDDEN },
+    {.name = "clickable", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_CLICKABLE },
+    {.name = "click-focusable", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_CLICK_FOCUSABLE },
+    {.name = "checkable", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_CHECKABLE },
+    {.name = "scrollable", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLLABLE },
+    {.name = "scroll-elastic", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_ELASTIC },
+    {.name = "scroll-momentum", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_MOMENTUM },
+    {.name = "scroll-one", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_ONE },
+    {.name = "scroll-chain-x", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_CHAIN_HOR },
+    {.name = "scroll-chain-y", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_CHAIN_VER },
+    {.name = "scroll-chain", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_CHAIN },
+    {.name = "scroll-on-focus", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_ON_FOCUS },
+    {.name = "scroll-with-arrow", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SCROLL_WITH_ARROW },
+    {.name = "snappable", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_SNAPPABLE },
+    {.name = "press-lock", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_PRESS_LOCK },
+    {.name = "event-bubble", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_EVENT_BUBBLE },
+    {.name = "gesture-bubble", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_GESTURE_BUBBLE },
+    {.name = "advanced-hit-test", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_ADV_HITTEST },
+    {.name = "ignore-layout", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_IGNORE_LAYOUT },
+    {.name = "floating", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_FLOATING },
+    {.name = "overflow-visible", .apply_cb = apply_flag, .context =(void *) LV_OBJ_FLAG_OVERFLOW_VISIBLE },
+    {.name = "layout-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_LAYOUT_1 },
+    {.name = "layoyt-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_LAYOUT_2 },
+    {.name = "widget-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_WIDGET_1 },
+    {.name = "widget-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_WIDGET_2 },
+    {.name = "user-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_1 },
+    {.name = "user-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_2 },
+    {.name = "user-3", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_3 },
+    {.name = "user-4", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_4 },
 
     //Flex
     {.name = "flex-flow", .apply_cb = apply_flex_flow },
@@ -80,7 +80,7 @@ const lv_xml_element_t lv_xml_obj_element =
 static void apply_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t width;
-    char unit = NULL;
+    char unit = 0;
     if (sscanf(value, "%d%c", &width, &unit))
     {
         if (unit == '%')
@@ -98,7 +98,7 @@ static void apply_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* valu
 static void apply_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t height;
-    char unit = NULL;
+    char unit = 0;
     if (sscanf(value, "%d%c", &height, &unit))
     {
         if (unit == '%')
@@ -116,7 +116,7 @@ static void apply_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* val
 static void apply_content_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t width;
-    char unit = NULL;
+    char unit = 0;
     if (sscanf(value, "%d%c", &width, &unit))
     {
         if (unit == '%')
@@ -134,7 +134,7 @@ static void apply_content_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, ch
 static void apply_content_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t height;
-    char unit = NULL;
+    char unit = 0;
     if (sscanf(value, "%d%c", &height, &unit))
     {
         if (unit == '%')
@@ -152,7 +152,7 @@ static void apply_content_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, c
 static void apply_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t x;
-    char unit = NULL;
+    char unit = 0;
 
     if (sscanf(value, "%d%c", &x, &unit))
     {
@@ -167,7 +167,7 @@ static void apply_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 static void apply_y(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint32_t y;
-    char unit = NULL;
+    char unit = 0;
     if (sscanf(value, "%d%c", &y, &unit))
     {
         if (unit == '%')
