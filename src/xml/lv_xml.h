@@ -3,6 +3,6 @@
 
 #include "../lvgl.h"
 
-lv_obj_t *lv_xml_inflate(const char *path);
+lv_obj_t *lv_xml_inflate(const char *xml);
 
 #endif

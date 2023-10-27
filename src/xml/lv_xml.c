@@ -28,19 +28,10 @@ const lv_xml_element_t *elements[] =
 
 static const size_t elements_count = sizeof(elements) / sizeof(lv_xml_element_t *);
 
-lv_obj_t *lv_xml_inflate(const char *path)
+lv_obj_t *lv_xml_inflate(const char *xml)
 {
     yxml_t *x = malloc(sizeof(yxml_t) + YXML_BUFFER_SIZE);
     yxml_init(x, x + 1, YXML_BUFFER_SIZE);
-
-    FILE *f = fopen(path, "r");
-    fseek(f, 0, SEEK_END);
-    size_t xml_length = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    
-    char *xml = malloc(xml_length);
-    fread(xml, 1, xml_length, f);
-    fclose(f);
 
     lv_obj_t *current_obj = NULL;
     lv_ll_t element_stack;
@@ -50,7 +41,8 @@ lv_obj_t *lv_xml_inflate(const char *path)
     char *attribute_value = malloc(sizeof(char) * 1024);
     size_t attribute_value_length = 0;
 
-    for(size_t i = 0; i < xml_length; i++)
+    size_t xml_len = strlen(xml);
+    for(size_t i = 0; i < xml_len; i++)
     {
         yxml_ret_t r = yxml_parse(x, xml[i]);
         switch (r)
