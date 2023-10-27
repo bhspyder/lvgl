@@ -12,6 +12,10 @@ static void apply_y(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_align(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_layout(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_ext_click_area(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
+static void apply_scrollbar_mode(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
+static void apply_scroll_direction(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
+static void apply_scroll_snap_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
+static void apply_scroll_snap_y(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_flex_flow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_flex_align(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_flex_grow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
@@ -28,7 +32,13 @@ static const lv_xml_attribute_t attributes[] =
     {.name = "y", .apply_cb = apply_y },
     {.name = "align", .apply_cb = apply_align },
     {.name = "layout", .apply_cb = apply_layout },
-    {.name = "ext-click-area", .apply_cb = apply_ext_click_area},
+    {.name = "ext-click-area", .apply_cb = apply_ext_click_area },
+
+    //Scrolling
+    {.name = "scrollbar-mode", .apply_cb = apply_scrollbar_mode },
+    {.name = "scroll-direction", .apply_cb = apply_scroll_direction },
+    {.name = "scroll-snap-x", .apply_cb = apply_scroll_snap_x },
+    {.name = "scroll-snap-y", .apply_cb = apply_scroll_snap_y },
 
     //Flags
     {.name = "hidden", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_HIDDEN },
@@ -83,15 +93,12 @@ static void apply_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* valu
     if (sscanf(value, "%d%c", &width, &unit))
     {
         if (unit == '%')
-        {
-            width = lv_pct(width);
-        }
+        { width = lv_pct(width); }
+        
         lv_obj_set_width(obj, width);
     }
     else if (!strcmp(value, "content"))
-    {
-        lv_obj_set_width(obj, LV_SIZE_CONTENT);
-    }
+    { lv_obj_set_width(obj, LV_SIZE_CONTENT); }
 }
 
 static void apply_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
@@ -101,15 +108,12 @@ static void apply_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* val
     if (sscanf(value, "%d%c", &height, &unit))
     {
         if (unit == '%')
-        {
-            height = lv_pct(height);
-        }
+        { height = lv_pct(height); }
+
         lv_obj_set_height(obj, height);
     }
     else if (!strcmp(value, "content"))
-    {
-        lv_obj_set_height(obj, LV_SIZE_CONTENT);
-    }
+    { lv_obj_set_height(obj, LV_SIZE_CONTENT); }
 }
 
 static void apply_content_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
@@ -119,15 +123,12 @@ static void apply_content_width(lv_xml_attribute_t* attribute, lv_obj_t* obj, ch
     if (sscanf(value, "%d%c", &width, &unit))
     {
         if (unit == '%')
-        {
-            width = lv_pct(width);
-        }
+        { width = lv_pct(width); }
+
         lv_obj_set_content_width(obj, width);
     }
     else if (!strcmp(value, "content"))
-    {
-        lv_obj_set_content_width(obj, LV_SIZE_CONTENT);
-    }
+    { lv_obj_set_content_width(obj, LV_SIZE_CONTENT); }
 }
 
 static void apply_content_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
@@ -137,15 +138,12 @@ static void apply_content_height(lv_xml_attribute_t* attribute, lv_obj_t* obj, c
     if (sscanf(value, "%d%c", &height, &unit))
     {
         if (unit == '%')
-        {
-            height = lv_pct(height);
-        }
+        { height = lv_pct(height); }
+
         lv_obj_set_content_height(obj, height);
     }
     else if (!strcmp(value, "content"))
-    {
-        lv_obj_set_content_height(obj, LV_SIZE_CONTENT);
-    }
+    { lv_obj_set_content_height(obj, LV_SIZE_CONTENT); }
 }
 
 static void apply_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
@@ -156,9 +154,8 @@ static void apply_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
     if (sscanf(value, "%d%c", &x, &unit))
     {
         if (unit == '%')
-        {
-            x = lv_pct(x);
-        }
+        { x = lv_pct(x); }
+
         lv_obj_set_x(obj, x);
     }
 }
@@ -170,9 +167,8 @@ static void apply_y(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
     if (sscanf(value, "%d%c", &y, &unit))
     {
         if (unit == '%')
-        {
-            y = lv_pct(y);
-        }
+        { y = lv_pct(y); }
+
         lv_obj_set_y(obj, y);
     }
 }
@@ -195,17 +191,66 @@ static void apply_align(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* valu
 
 static void apply_layout(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
-    uint32_t layout = 0;
-    if (!strcmp(value, "flex"))         layout = LV_LAYOUT_FLEX;
-    else if (!strcmp(value, "grid"))    layout = LV_LAYOUT_GRID;
+    lv_layout_t layout = LV_LAYOUT_NONE;
+    if (!strcmp(value, "none")) layout = LV_LAYOUT_NONE;
+    else if (!strcmp(value, "flex")) layout = LV_LAYOUT_FLEX;
+    else if (!strcmp(value, "grid")) layout = LV_LAYOUT_GRID;
 
-    lv_obj_set_layout(obj, LV_LAYOUT_GRID);
+    lv_obj_set_layout(obj, layout);
 }
 
 static void apply_ext_click_area(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
 {
     uint8_t size = atoi(value);
     lv_obj_set_ext_click_area(obj, size);
+}
+
+static void apply_scrollbar_mode(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
+{
+    lv_scrollbar_mode_t mode = LV_SCROLLBAR_MODE_OFF;
+    if (!strcmp(value, "off")) mode = LV_SCROLLBAR_MODE_OFF;
+    else if (!strcmp(value, "on")) mode = LV_SCROLLBAR_MODE_ON;
+    else if (!strcmp(value, "active")) mode = LV_SCROLLBAR_MODE_ACTIVE;
+    else if (!strcmp(value, "auto")) mode = LV_SCROLLBAR_MODE_AUTO;
+
+    lv_obj_set_scrollbar_mode(obj, mode);
+}
+
+static void apply_scroll_direction(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
+{
+    lv_dir_t direction = LV_DIR_NONE;
+    if (!strcmp(value, "none")) direction = LV_DIR_NONE;
+    else if (!strcmp(value, "left")) direction = LV_DIR_LEFT;
+    else if (!strcmp(value, "right")) direction = LV_DIR_RIGHT;
+    else if (!strcmp(value, "top")) direction = LV_DIR_TOP;
+    else if (!strcmp(value, "bottom")) direction = LV_DIR_BOTTOM;
+    else if (!strcmp(value, "horizontal")) direction = LV_DIR_HOR;
+    else if (!strcmp(value, "vertical")) direction = LV_DIR_VER;
+    else if (!strcmp(value, "all")) direction = LV_DIR_ALL;
+
+    lv_obj_set_scroll_dir(obj, direction);
+}
+
+static void apply_scroll_snap_x(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
+{
+    lv_scroll_snap_t snap = LV_SCROLL_SNAP_NONE;
+    if (!strcmp(value, "none")) snap = LV_SCROLL_SNAP_NONE;
+    else if (!strcmp(value, "start")) snap = LV_SCROLL_SNAP_START;
+    else if (!strcmp(value, "end")) snap = LV_SCROLL_SNAP_END;
+    else if (!strcmp(value, "center")) snap = LV_SCROLL_SNAP_CENTER;
+
+    lv_obj_set_scroll_snap_x(obj, snap);
+}
+
+static void apply_scroll_snap_y(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
+{
+    lv_scroll_snap_t snap = LV_SCROLL_SNAP_NONE;
+    if (!strcmp(value, "none")) snap = LV_SCROLL_SNAP_NONE;
+    else if (!strcmp(value, "start")) snap = LV_SCROLL_SNAP_START;
+    else if (!strcmp(value, "end")) snap = LV_SCROLL_SNAP_END;
+    else if (!strcmp(value, "center")) snap = LV_SCROLL_SNAP_CENTER;
+
+    lv_obj_set_scroll_snap_y(obj, snap);
 }
 
 static void apply_flag(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
@@ -216,13 +261,9 @@ static void apply_flag(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value
 
     lv_obj_flag_t flag = (lv_obj_flag_t)attribute->context;
     if (enabled)
-    {
-        lv_obj_add_flag(obj, flag);
-    }
+    { lv_obj_add_flag(obj, flag); }
     else
-    {
-        lv_obj_clear_flag(obj, flag);
-    }
+    { lv_obj_remove_flag(obj, flag); }
 }
 
 static void apply_flex_flow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)

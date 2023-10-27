@@ -7,7 +7,7 @@
 #include "lv_xml.h"
 
 #include "elements/lv_xml_obj.h"
-#include "elements/lv_xml_btn.h"
+#include "elements/lv_xml_button.h"
 #include "elements/lv_xml_label.h" 
 
 #define YXML_BUFFER_SIZE    4096
@@ -22,7 +22,7 @@
 const lv_xml_element_t *elements[] =
 {
     &lv_xml_obj_element,
-    &lv_xml_btn_element,
+    &lv_xml_button_element,
     &lv_xml_label_element
 };
 
