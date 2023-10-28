@@ -9,6 +9,7 @@
 #include "elements/lv_xml_obj.h"
 #include "elements/lv_xml_button.h"
 #include "elements/lv_xml_label.h" 
+#include "elements/lv_xml_switch.h"
 
 #define YXML_BUFFER_SIZE    4096
 
@@ -23,7 +24,8 @@ const lv_xml_element_t *elements[] =
 {
     &lv_xml_obj_element,
     &lv_xml_button_element,
-    &lv_xml_label_element
+    &lv_xml_label_element,
+    &lv_xml_switch_element
 };
 
 static const size_t elements_count = sizeof(elements) / sizeof(lv_xml_element_t *);
