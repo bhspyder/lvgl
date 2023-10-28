@@ -13,6 +13,7 @@
 #include "elements/lv_xml_dropdown.h"
 #include "elements/lv_xml_checkbox.h"
 #include "elements/lv_xml_slider.h"
+#include "elements/lv_xml_bar.h"
 
 #define YXML_BUFFER_SIZE    4096
 
@@ -31,7 +32,8 @@ const lv_xml_element_t *elements[] =
     &lv_xml_switch_element,
     &lv_xml_dropdown_element,
     &lv_xml_checkbox_element,
-    &lv_xml_slider_element
+    &lv_xml_slider_element,
+    &lv_xml_bar_element
 };
 
 static const size_t elements_count = sizeof(elements) / sizeof(lv_xml_element_t *);
