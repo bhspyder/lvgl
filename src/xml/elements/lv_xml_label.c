@@ -1,11 +1,11 @@
-﻿#include <stdlib.h> 
+﻿#include <stdlib.h>
 
 #include "lv_xml_obj.h"
 #include "lv_xml_label.h"
 
 static void apply_text(lv_xml_attribute_t *attribute, lv_obj_t *obj, char *value);
 
-const lv_xml_attribute_t attributes[] =
+static const lv_xml_attribute_t attributes[] =
 {
     { .name = "text", .apply_cb = apply_text }
 };

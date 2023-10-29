@@ -20,6 +20,7 @@ static void apply_flex_flow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* 
 static void apply_flex_align(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_flex_grow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
 static void apply_flag(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value);
+static void apply_state(lv_xml_attribute_t *attribute, lv_obj_t* obj, char* value);
 
 static const lv_xml_attribute_t attributes[] =
 {
@@ -39,6 +40,16 @@ static const lv_xml_attribute_t attributes[] =
     {.name = "scroll-direction", .apply_cb = apply_scroll_direction },
     {.name = "scroll-snap-x", .apply_cb = apply_scroll_snap_x },
     {.name = "scroll-snap-y", .apply_cb = apply_scroll_snap_y },
+
+    //States
+    {.name = "checked", .apply_cb = apply_state, .context = (void *)LV_STATE_CHECKED },
+    {.name = "focused", .apply_cb = apply_state, .context = (void *)LV_STATE_FOCUSED },
+    {.name = "focus-key", .apply_cb = apply_state, .context = (void *)LV_STATE_FOCUS_KEY },
+    {.name = "edited", .apply_cb = apply_state, .context = (void *)LV_STATE_EDITED },
+    {.name = "hovered", .apply_cb = apply_state, .context = (void *)LV_STATE_HOVERED },
+    {.name = "pressed", .apply_cb = apply_state, .context = (void *)LV_STATE_PRESSED },
+    {.name = "scrolled", .apply_cb = apply_state, .context = (void *)LV_STATE_SCROLLED },
+    {.name = "disabled", .apply_cb = apply_state, .context = (void *)LV_STATE_DISABLED },
 
     //Flags
     {.name = "hidden", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_HIDDEN },
@@ -62,14 +73,6 @@ static const lv_xml_attribute_t attributes[] =
     {.name = "ignore-layout", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_IGNORE_LAYOUT },
     {.name = "floating", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_FLOATING },
     {.name = "overflow-visible", .apply_cb = apply_flag, .context =(void *) LV_OBJ_FLAG_OVERFLOW_VISIBLE },
-    {.name = "layout-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_LAYOUT_1 },
-    {.name = "layoyt-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_LAYOUT_2 },
-    {.name = "widget-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_WIDGET_1 },
-    {.name = "widget-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_WIDGET_2 },
-    {.name = "user-1", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_1 },
-    {.name = "user-2", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_2 },
-    {.name = "user-3", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_3 },
-    {.name = "user-4", .apply_cb = apply_flag, .context = (void *)LV_OBJ_FLAG_USER_4 },
 
     //Flex
     {.name = "flex-flow", .apply_cb = apply_flex_flow },
@@ -264,6 +267,19 @@ static void apply_flag(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value
     { lv_obj_add_flag(obj, flag); }
     else
     { lv_obj_remove_flag(obj, flag); }
+}
+
+static void apply_state(lv_xml_attribute_t *attribute, lv_obj_t* obj, char* value)
+{
+    bool enabled = false;
+    if (!strcmp(value, "true")) enabled = true;
+    else if (!strcmp(value, "false")) enabled = false;
+
+    lv_state_t state = (lv_state_t)attribute->context;
+    if (enabled)
+    { lv_obj_add_state(obj, state); }
+    else
+    { lv_obj_remove_state(obj, state); }
 }
 
 static void apply_flex_flow(lv_xml_attribute_t* attribute, lv_obj_t* obj, char* value)
