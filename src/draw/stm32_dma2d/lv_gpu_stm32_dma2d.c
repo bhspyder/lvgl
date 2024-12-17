@@ -82,7 +82,7 @@ static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initi
 void lv_draw_stm32_dma2d_init(void)
 {
     // Enable DMA2D clock
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32H7) || defined(STM32U5)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN; // enable DMA2D
     // wait for hardware access to complete
     __asm volatile("DSB\n");
