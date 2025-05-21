@@ -230,7 +230,11 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
 {
     if(draw_ctx->draw_img_decoded == NULL) return;
 
+#ifdef FW_ETHERNET_BUILD
     draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, GUI_DATA_OFFSET_PTR(map_p), color_format);
+#else
+    draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+#endif
 }
 
 /**********************

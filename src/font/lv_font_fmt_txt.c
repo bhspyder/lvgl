@@ -87,7 +87,11 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+#ifdef FW_ETHERNET_BUILD
         return GUI_DATA_OFFSET_PTR(&fdsc->glyph_bitmap[gdsc->bitmap_index]);
+#else
+        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+#endif
     }
     /*Handle compressed bitmap*/
     else {
