@@ -97,7 +97,12 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap)
+#ifdef FW_ETHERNET_BUILD
+        return GUI_DATA_OFFSET_PTR(&fdsc->glyph_bitmap[gdsc->bitmap_index]);
+#else
+        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+#endif
 
     uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
@@ -106,7 +111,11 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     uint16_t stride_in = g_dsc->stride;
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+#ifdef FW_ETHERNET_BUILD
+        const uint8_t * bitmap_in = GUI_DATA_OFFSET_PTR(&fdsc->glyph_bitmap[gdsc->bitmap_index]);
+#else
         const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+#endif
         uint8_t * bitmap_out_tmp = bitmap_out;
         int32_t i = 0;
         int32_t x, y;

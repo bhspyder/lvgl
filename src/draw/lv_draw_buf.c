@@ -614,8 +614,13 @@ void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 
 lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
 {
+#ifdef FW_ETHERNET_BUILD
+    const lv_result_t res = lv_draw_buf_init(buf, img->header.w, img->header.h, img->header.cf, img->header.stride,
+    										 GUI_DATA_OFFSET_PTR((void *)img->data), img->data_size);
+#else
     const lv_result_t res = lv_draw_buf_init(buf, img->header.w, img->header.h, img->header.cf, img->header.stride,
                                              (void *)img->data, img->data_size);
+#endif
     if(res != LV_RESULT_OK) {
         return res;
     }
