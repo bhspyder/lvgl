@@ -2,12 +2,13 @@
 
 #if LV_USE_TRANSLATION && LV_USE_DROPDOWN && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
-static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-static const char * languages[] = {"English", "Deutsch", "Español", NULL};
+/* Arrays are defined `const` to place them in program space instead of RAM. */
+static const char * const tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+static const char * const languages[] = {"English", "Deutsch", "Español", NULL};
 
 static void add_static_translations(void)
 {
-    static const char * translations[] = {
+    static const char * const translations[] = {
         "The Tiger",    "Der Tiger",     "El Tigre",
         "The Lion",     "Der Löwe",      "El León",
         "The Rabbit",   "Das Kaninchen", "El Conejo",
@@ -38,7 +39,15 @@ static void language_change_cb(lv_event_t * e)
 }
 
 /**
- * Change label text when the translation language changes
+ * @title Live language switching from a dropdown
+ * @brief Refresh translated labels on `LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`.
+ *
+ * A dropdown lists the entries in the `languages` array (English, Deutsch, Español). Its
+ * `LV_EVENT_VALUE_CHANGED` callback reads the selected string and calls
+ * `lv_translation_set_language`. One label is created per tag in the `tags`
+ * array and subscribes to `LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`; the handler
+ * rewrites its text with `lv_tr(tag)`. The screen uses a centered column flex
+ * layout and starts in English.
  */
 void lv_example_translation_2(void)
 {

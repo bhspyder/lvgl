@@ -176,7 +176,8 @@ static void draw_part_event_cb(lv_event_t * e)
 
 static void invalidate_area_event_cb(lv_event_t * e)
 {
-    lv_area_t * inv = lv_event_get_param(e);
+    lv_area_t * inv = lv_event_get_invalidated_area(e);
+    TEST_ASSERT_NOT_NULL(inv);
     lv_area_copy(&g_inv_area, inv);
     g_inv_count++;
 }
@@ -185,7 +186,7 @@ void test_table_rendering(void)
 {
     lv_obj_center(table);
     lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(table, true);
     lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
     lv_obj_set_style_pad_all(table, 10, LV_PART_ITEMS);
     lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
@@ -221,25 +222,34 @@ void test_table_rendering(void)
     g_inv_count = 0;
     lv_display_add_event_cb(lv_display_get_default(), invalidate_area_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
     lv_table_set_cell_value(table, 1, 0, "changed");
-    TEST_ASSERT_EQUAL_INT32(1, g_inv_count);
-    int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
-                               + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
-                               + lv_table_get_column_width(table, 4);
+
+    /* In FULL render mode lv_inv_area() requests a whole-screen redraw and never emits
+     * LV_EVENT_INVALIDATE_AREA, so the precise per-cell invalidated-area check below only
+     * applies to partial/direct rendering. In FULL mode just verify the change is accepted. */
+    if(lv_display_get_render_mode(lv_display_get_default()) == LV_DISPLAY_RENDER_MODE_FULL) {
+        TEST_ASSERT_EQUAL_INT32(0, g_inv_count);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(1, g_inv_count);
+        int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
+                                   + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
+                                   + lv_table_get_column_width(table, 4);
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    /**
-     * From `lv_obj_pos`:
-     *
-     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
-     * which can be solved by expanding the redrawing area.
-     * lv_area_increase(&area_tmp, 5, 5);
-     *
-     * This accommodates for this specific calculation.
-     */
-    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
+        /**
+         * From `lv_obj_pos`:
+         *
+         * When using the global matrix, the vertex coordinates of clip_area lose precision after
+         * transformation, which can be solved by expanding the redrawing area.
+         * lv_area_increase(&area_tmp, 5, 5);
+         *
+         * This accommodates for this specific calculation.
+         */
+        TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
 #else
-    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
+        TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
 #endif
+    }
 }
 
 /* See #3120 for context */
@@ -348,6 +358,35 @@ void test_table_cell_select_should_not_allow_set_on_table_with_no_rows(void)
 
     TEST_ASSERT_EQUAL_UINT32(LV_TABLE_CELL_NONE, selected_row);
     TEST_ASSERT_EQUAL_UINT32(LV_TABLE_CELL_NONE, selected_column);
+}
+
+void test_table_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * tbl = lv_table_create(lv_screen_active());
+
+    lv_table_set_row_count(tbl, 5);
+    lv_table_set_column_count(tbl, 3);
+
+    /* Test getters */
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(tbl, LV_PROPERTY_TABLE_ROW_COUNT).num);
+    TEST_ASSERT_EQUAL_INT(3, lv_obj_get_property(tbl, LV_PROPERTY_TABLE_COLUMN_COUNT).num);
+
+    /* Test setters */
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_TABLE_ROW_COUNT;
+    prop.num = 8;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tbl, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(8, lv_table_get_row_count(tbl));
+
+    prop.id = LV_PROPERTY_TABLE_COLUMN_COUNT;
+    prop.num = 4;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tbl, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(4, lv_table_get_column_count(tbl));
+
+    lv_obj_delete(tbl);
+#endif
 }
 
 #endif

@@ -7,18 +7,17 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
-#include "lv_draw_vg_lite_type.h"
 #include "../../misc/lv_area_private.h"
-#include <string.h>
+#include "../../image/lv_image_decoder_private.h"
 #include <math.h>
 
 /*********************
@@ -56,6 +55,8 @@ static void image_dsc_free_cb(void * dsc, void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static bool g_is_dump_param_enabled = false;
 
 /**********************
  *      MACROS
@@ -310,6 +311,8 @@ static void path_data_print_cb(void * user_data, uint8_t op_code, const float * 
     LV_UNUSED(user_data);
     const char * op_str = lv_vg_lite_vlc_op_string(op_code);
 
+    LV_UNUSED(op_str);
+
     switch(len) {
         case 0:
             LV_LOG("%s,\n", op_str);
@@ -358,7 +361,12 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
     LV_LOG_USER("type: %d", (int)path->path_type);
     LV_LOG_USER("add_end: %d", (int)path->add_end);
 
-    lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    if(len <= LV_VG_LITE_PATH_DUMP_MAX_LEN) {
+        lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    }
+    else {
+        LV_LOG_WARN("path length over %d, skip print", LV_VG_LITE_PATH_DUMP_MAX_LEN);
+    }
 
     if(path->stroke) {
         LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
@@ -574,9 +582,6 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
-
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
-            return VG_LITE_RGB565;
 
         case LV_COLOR_FORMAT_ARGB8565:
             return VG_LITE_BGRA5658;
@@ -895,7 +900,13 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_set_CLUT");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data), {});
+        LV_VG_LITE_CHECK_ERROR(
+        vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data), {
+            for(uint32_t i = 0; i < palette_size; i++)
+            {
+                LV_LOG_USER("CLUT[%" LV_PRIu32 "] = 0x%08X", i, ((vg_lite_uint32_t *)decoded->data)[i]);
+            }
+        });
         LV_PROFILER_DRAW_END_TAG("vg_lite_set_CLUT");
     }
 
@@ -1279,9 +1290,75 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 {
     lv_point_precise_t p;
     const vg_lite_float_t (*m)[3] = matrix->m;
-    p.x = (lv_value_precise_t)roundf(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
-    p.y = (lv_value_precise_t)roundf(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
+    float x = (float)point->x * m[0][0] + (float)point->y * m[0][1] + m[0][2];
+    float y = (float)point->x * m[1][0] + (float)point->y * m[1][1] + m[1][2];
+
+    /* perspective division, the matrix is not affine */
+    if(lv_vg_lite_matrix_has_perspective(matrix)) {
+        float w = (float)point->x * m[2][0] + (float)point->y * m[2][1] + m[2][2];
+        if(w != 0.0f) {
+            x /= w;
+            y /= w;
+        }
+    }
+
+    p.x = (lv_value_precise_t)roundf(x);
+    p.y = (lv_value_precise_t)roundf(y);
     return p;
+}
+
+bool lv_vg_lite_matrix_transform_area(lv_area_t * dest, const vg_lite_matrix_t * matrix, const lv_area_t * src)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(matrix);
+    LV_ASSERT_NULL(src);
+
+    const float corner_x[4] = {
+        (float)src->x1, (float)(src->x2 + 1), (float)(src->x2 + 1), (float)src->x1
+    };
+    const float corner_y[4] = {
+        (float)src->y1, (float)src->y1, (float)(src->y2 + 1), (float)(src->y2 + 1)
+    };
+
+    const vg_lite_float_t (*m)[3] = matrix->m;
+    const bool has_perspective = lv_vg_lite_matrix_has_perspective(matrix);
+
+    float min_x = 0, min_y = 0, max_x = 0, max_y = 0;
+
+    for(int i = 0; i < 4; i++) {
+        float x = corner_x[i] * m[0][0] + corner_y[i] * m[0][1] + m[0][2];
+        float y = corner_x[i] * m[1][0] + corner_y[i] * m[1][1] + m[1][2];
+
+        if(has_perspective) {
+            float w = corner_x[i] * m[2][0] + corner_y[i] * m[2][1] + m[2][2];
+
+            /* The corner is on or behind the vanishing line, the bounding box is not computable */
+            if(w <= 0.0f) {
+                return false;
+            }
+
+            x /= w;
+            y /= w;
+        }
+
+        if(i == 0) {
+            min_x = max_x = x;
+            min_y = max_y = y;
+            continue;
+        }
+
+        min_x = LV_MIN(min_x, x);
+        min_y = LV_MIN(min_y, y);
+        max_x = LV_MAX(max_x, x);
+        max_y = LV_MAX(max_y, y);
+    }
+
+    dest->x1 = (int32_t)floorf(min_x);
+    dest->y1 = (int32_t)floorf(min_y);
+    dest->x2 = (int32_t)ceilf(max_x) - 1;
+    dest->y2 = (int32_t)ceilf(max_y) - 1;
+
+    return true;
 }
 
 void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area)
@@ -1311,10 +1388,10 @@ void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_ar
                                area->y1,
                                area->x2 + 1,
                                area->y2 + 1),
-                           /* Error handler */
+                           /* Dump parameters */
     {
-        LV_LOG_ERROR("area: %d, %d, %d, %d",
-                     (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
+        LV_LOG_USER("area: %d, %d, %d, %d",
+                    (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
     });
 
     u->current_scissor_area = *area;
@@ -1330,9 +1407,9 @@ void lv_vg_lite_disable_scissor(void)
                                0,
                                LV_HOR_RES,
                                LV_VER_RES),
-                           /* Error handler */
+                           /* Dump parameters */
     {
-        LV_LOG_ERROR("hor_res: %d, ver_res: %d", (int)LV_HOR_RES, (int)LV_VER_RES);
+        LV_LOG_USER("hor_res: %d, ver_res: %d", (int)LV_HOR_RES, (int)LV_VER_RES);
     });
     LV_PROFILER_DRAW_END;
 }
@@ -1371,6 +1448,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     lv_vg_lite_pending_swap(u->image_dsc_pending);
 
     lv_vg_lite_pending_swap(u->bitmap_font_pending);
+    lv_vg_lite_pending_swap(u->letter_pending);
 
     u->flush_count = 0;
     LV_PROFILER_DRAW_END;
@@ -1393,6 +1471,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     /* Clear bitmap font dsc reference */
     lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
+    lv_vg_lite_pending_remove_all(u->letter_pending);
 
     /* Reset scissor area */
     lv_memzero(&u->current_scissor_area, sizeof(u->current_scissor_area));
@@ -1418,13 +1497,24 @@ void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey)
             .low_g = colorkey->low.green,
             .low_b = colorkey->low.blue,
             .alpha = 0,
-            .hign_r = colorkey->high.red,
-            .hign_g = colorkey->high.green,
-            .hign_b = colorkey->high.blue,
+            .high_r = colorkey->high.red,
+            .high_g = colorkey->high.green,
+            .high_b = colorkey->high.blue,
         };
         vg_colorkey[0] = key0;
     }
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_color_key(vg_colorkey), {});
+}
+
+void lv_vg_lite_set_dump_param_enable(bool enable)
+{
+    g_is_dump_param_enabled = enable;
+    LV_LOG_USER(enable ? "Enabled" : "Disabled");
+}
+
+bool lv_vg_lite_is_dump_param_enabled(void)
+{
+    return g_is_dump_param_enabled;
 }
 
 /**********************

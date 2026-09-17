@@ -7,23 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include "lv_opengles_glfw.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_GLFW
 
-#include "lv_opengles_window.h"
-#include "lv_opengles_driver.h"
-#include "lv_opengles_texture.h"
-#include "lv_opengles_private.h"
 #include "lv_opengles_debug.h"
-
-#include "../../core/lv_refr.h"
-#include "../../stdlib/lv_sprintf.h"
-#include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
-#include "../../display/lv_display_private.h"
-#include "../../indev/lv_indev.h"
-#include "../../lv_init.h"
+#include "lv_opengles_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../draw/opengles/lv_draw_opengles.h"
 
 #include <stdlib.h>
 
@@ -71,7 +62,7 @@ static uint32_t lv_glfw_tick_count_callback(void);
 static lv_opengles_window_t * lv_glfw_get_lv_window_from_window(GLFWwindow * window);
 static void glfw_error_cb(int error, const char * description);
 static int lv_glfw_init(void);
-static int lv_glew_init(void);
+static lv_result_t lv_glad_init(void);
 static void lv_glfw_timer_init(void);
 static void lv_glfw_window_config(GLFWwindow * window, bool use_mouse_indev);
 static void lv_glfw_window_quit(void);
@@ -92,7 +83,7 @@ static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area,
  *  STATIC VARIABLES
  **********************/
 static bool glfw_inited;
-static bool glew_inited;
+static bool glad_inited;
 static lv_timer_t * update_handler_timer;
 static lv_ll_t glfw_window_ll;
 #if !LV_USE_DRAW_OPENGLES
@@ -110,7 +101,8 @@ static lv_ll_t glfw_window_ll;
 lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev,
                                                          bool h_flip, bool v_flip,  const char * title)
 {
-    LV_ASSERT_NULL(title);
+    LV_CHECK_ARG(title != NULL, return NULL);
+
     if(lv_glfw_init() != 0) {
         LV_LOG_ERROR("Failed to init glfw");
         return NULL;
@@ -152,7 +144,16 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
     glfwSetWindowUserPointer(window->window, window);
     lv_glfw_timer_init();
     lv_glfw_window_config(window->window, use_mouse_indev);
-    lv_glew_init();
+
+    lv_result_t res = lv_glad_init();
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to init glad");
+        glfwDestroyWindow(window->window);
+        lv_ll_remove(&glfw_window_ll, window);
+        lv_free(window);
+        return NULL;
+    }
+
     glfwMakeContextCurrent(window->window);
     lv_opengles_init();
 
@@ -166,11 +167,16 @@ lv_opengles_window_t * lv_opengles_glfw_window_create(int32_t hor_res, int32_t v
 
 void lv_opengles_glfw_window_set_title(lv_opengles_window_t * window, const char * new_title)
 {
+    LV_CHECK_ARG(window != NULL, return);
+    LV_CHECK_ARG(new_title != NULL, return);
+
     glfwSetWindowTitle(window->window, new_title);
 }
 
 void lv_opengles_window_delete(lv_opengles_window_t * window)
 {
+    if(window == NULL) return;
+
     glfwDestroyWindow(window->window);
 
     lv_opengles_window_texture_t * texture;
@@ -199,11 +205,15 @@ void lv_opengles_window_delete(lv_opengles_window_t * window)
 
 void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window)
 {
+    LV_CHECK_ARG(window != NULL, return NULL);
+
     return (void *)(window->window);
 }
 
 void lv_opengles_glfw_window_set_flip(lv_opengles_window_t * window, bool h_flip, bool v_flip)
 {
+    LV_CHECK_ARG(window != NULL, return);
+
     window->h_flip = h_flip;
     window->v_flip = v_flip;
 }
@@ -211,6 +221,8 @@ void lv_opengles_glfw_window_set_flip(lv_opengles_window_t * window, bool h_flip
 lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id,
                                                               int32_t w, int32_t h)
 {
+    LV_CHECK_ARG(window != NULL, return NULL);
+
     lv_opengles_window_texture_t * texture = lv_ll_ins_tail(&window->textures);
     LV_ASSERT_MALLOC(texture);
     if(texture == NULL) return NULL;
@@ -245,6 +257,8 @@ lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window
 
 void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 {
+    LV_CHECK_ARG(texture != NULL, return);
+
     if(texture->texture_id == 0) {
         LV_LOG_WARN("window displays should be deleted with `lv_display_delete`");
         return;
@@ -263,6 +277,8 @@ void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 
 lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, int32_t w, int32_t h)
 {
+    LV_CHECK_ARG(window != NULL, return NULL);
+
     lv_display_t * disp = lv_display_create(w, h);
     if(disp == NULL) {
         return NULL;
@@ -284,6 +300,7 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(disp, &dummy_buf, NULL, h * lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888),
                            LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_draw_buf_handlers(disp, lv_draw_opengles_get_draw_buf_handlers());
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
     uint32_t buf_size = stride * h;
@@ -328,11 +345,14 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
 
 lv_opengles_window_texture_t * lv_opengles_window_display_get_window_texture(lv_display_t * window_display)
 {
+    LV_CHECK_ARG(window_display != NULL, return NULL);
     return lv_display_get_driver_data(window_display);
 }
 
 void lv_opengles_window_texture_set_x(lv_opengles_window_texture_t * texture, int32_t x)
 {
+    LV_CHECK_ARG(texture != NULL, return);
+
     lv_area_set_pos(&texture->area, x, texture->area.y1);
 
 #if LV_USE_DRAW_OPENGLES
@@ -342,6 +362,8 @@ void lv_opengles_window_texture_set_x(lv_opengles_window_texture_t * texture, in
 
 void lv_opengles_window_texture_set_y(lv_opengles_window_texture_t * texture, int32_t y)
 {
+    LV_CHECK_ARG(texture != NULL, return);
+
     lv_area_set_pos(&texture->area, texture->area.x1, y);
 
 #if LV_USE_DRAW_OPENGLES
@@ -351,6 +373,8 @@ void lv_opengles_window_texture_set_y(lv_opengles_window_texture_t * texture, in
 
 void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, lv_opa_t opa)
 {
+    LV_CHECK_ARG(texture != NULL, return);
+
     texture->opa = opa;
 
 #if LV_USE_DRAW_OPENGLES
@@ -360,6 +384,8 @@ void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, 
 
 lv_indev_t * lv_opengles_window_texture_get_mouse_indev(lv_opengles_window_texture_t * texture)
 {
+    LV_CHECK_ARG(texture != NULL, return NULL);
+
     return texture->indev;
 }
 
@@ -387,24 +413,24 @@ static int lv_glfw_init(void)
     return 0;
 }
 
-static int lv_glew_init(void)
+static lv_result_t lv_glad_init(void)
 {
-    if(glew_inited) {
-        return 0;
+    if(glad_inited) {
+        return LV_RESULT_OK;
     }
 
-    GLenum ret = glewInit();
-    if(ret != GLEW_OK) {
-        LV_LOG_ERROR("glewInit fail: %d.", ret);
-        return ret;
+
+    if(!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+        LV_LOG_ERROR("Failed to load OpenGL functions");
+        return LV_RESULT_INVALID;
     }
 
     LV_LOG_INFO("GL version: %s", glGetString(GL_VERSION));
     LV_LOG_INFO("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    glew_inited = true;
+    glad_inited = true;
 
-    return 0;
+    return LV_RESULT_OK;
 }
 
 static void lv_glfw_timer_init(void)
@@ -438,10 +464,10 @@ static void lv_glfw_window_quit(void)
     lv_timer_delete(update_handler_timer);
     update_handler_timer = NULL;
 
+    lv_deinit();
+
     glfwTerminate();
     glfw_inited = false;
-
-    lv_deinit();
 
     exit(0);
 }
@@ -508,33 +534,22 @@ static void window_update_handler(lv_timer_t * t)
 #if !LV_USE_DRAW_OPENGLES
                 ensure_init_window_display_texture();
 
-                GL_CALL(glBindTexture(GL_TEXTURE_2D, window_display_texture));
-
                 /* set the dimensions and format to complete the texture */
-                /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 8
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_RED, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 16
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                                     texture->fb));
-#elif LV_COLOR_DEPTH == 24
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_BGR, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 32
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_BGRA, GL_UNSIGNED_BYTE, texture->fb));
-#else
-#error("Unsupported color format")
-#endif
+                const lv_color_format_t cf = lv_display_get_color_format(texture->disp);
+                const int32_t tex_w = lv_area_get_width(&texture->area);
+                const int32_t tex_h = lv_area_get_height(&texture->area);
+                if(lv_opengles_texture_upload_buf(window_display_texture, texture->fb, tex_w, tex_h,
+                                                  lv_draw_buf_width_to_stride(tex_w, cf), cf) != LV_RESULT_OK) {
+                    continue;
+                }
 
                 GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
                 GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
-                lv_opengles_render_texture(window_display_texture, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                lv_opengles_render_texture_cf(window_display_texture, &texture->area, texture->opa, window->hor_res,
+                                              window->ver_res,
+                                              &texture->area, window->h_flip, window->v_flip, cf);
 #endif
             }
             else {
@@ -551,11 +566,21 @@ static void window_update_handler(lv_timer_t * t)
                 }
 
 #if LV_USE_DRAW_OPENGLES
+                /*The draw unit rendered into the texture, in the OpenGL channel order*/
                 lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
                                            &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
 #else
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                if(texture->disp != NULL) {
+                    /*The texture display uploaded its buffer, so its color format tells the channel order*/
+                    lv_opengles_render_texture_cf(texture->texture_id, &texture->area, texture->opa, window->hor_res,
+                                                  window->ver_res, &texture->area, window->h_flip, window->v_flip,
+                                                  lv_display_get_color_format(texture->disp));
+                }
+                else {
+                    /*A texture of the application, assume the OpenGL channel order*/
+                    lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res,
+                                               window->ver_res, &texture->area, window->h_flip, window->v_flip);
+                }
 #endif
             }
         }

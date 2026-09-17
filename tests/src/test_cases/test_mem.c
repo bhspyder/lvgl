@@ -14,13 +14,186 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-/* #3324 */
-void test_mem_buf_realloc(void)
+void test_malloc(void)
 {
-#ifdef LVGL_CI_USING_DEF_HEAP
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_malloc(32);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+static void check_zero_mem(const void * data, size_t size)
+{
+    const uint8_t * p = data;
+    for(size_t i = 0; i < size; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0, p[i]);
+    }
+}
+
+void test_calloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_calloc(4, 8);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    check_zero_mem(buf, 32);
+
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+void test_calloc_overflow(void)
+{
+    const size_t max_half = ((size_t) -1) / 2 + 1;
+    TEST_ASSERT_NULL(lv_calloc(max_half, 2));
+    TEST_ASSERT_NULL(lv_calloc(2, max_half));
+}
+
+void test_zalloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_zalloc(32);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    check_zero_mem(buf, 32);
+
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+void test_realloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_malloc(16);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    buf = lv_realloc(buf, 32);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    buf = lv_realloc(buf, 8);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    lv_free(buf);
+
+    /* Should behave like malloc */
+    buf = lv_realloc(NULL, 16);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_free(buf);
+
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+/* #3324 */
+void test_realloc_failed(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    uint32_t mem = lv_test_get_free_mem();
+
     void * buf1 = lv_malloc(20);
-    void * buf2 = lv_realloc(buf1, LV_MEM_SIZE + 16384);
+
+    void * buf2 = lv_realloc(buf1, LV_MEM_SIZE + 1);
     TEST_ASSERT_NULL(buf2);
+
+    /* Realloc failed, but should free buf1 */
+    void * buf3 = lv_reallocf(buf1, LV_MEM_SIZE + 1);
+    TEST_ASSERT_NULL(buf3);
+
+    void * buf4 = lv_reallocf(NULL, 30);
+    TEST_ASSERT_NOT_NULL(buf4);
+    lv_free(buf4);
+
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_malloc_failed(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    uint32_t mem = lv_test_get_free_mem();
+    TEST_ASSERT_NULL(lv_malloc(LV_MEM_SIZE + 1));
+    TEST_ASSERT_NULL(lv_malloc_zeroed(LV_MEM_SIZE + 1));
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_malloc_size_overflow(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    uint32_t mem = lv_test_get_free_mem();
+
+    /* Aligning these up wraps around, which must not turn them into a tiny request */
+    for(size_t i = 0; i < 2 * lv_tlsf_align_size(); i++) {
+        TEST_ASSERT_NULL(lv_malloc(SIZE_MAX - i));
+        TEST_ASSERT_NULL(lv_malloc_zeroed(SIZE_MAX - i));
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_realloc_size_overflow(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    const size_t len = 100;
+    uint32_t mem = lv_test_get_free_mem();
+
+    uint8_t * buf = lv_malloc(len);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_memset(buf, 0xA5, len);
+
+    for(size_t i = 0; i < 2 * lv_tlsf_align_size(); i++) {
+        TEST_ASSERT_NULL(lv_realloc(buf, SIZE_MAX - i));
+    }
+
+    /* Shrinking buf instead of failing would write a block header over its payload */
+    for(size_t i = 0; i < len; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0xA5, buf[i]);
+    }
+
+    /* ...and would hand the trailing part of buf out to the next allocation */
+    uint8_t * other = lv_malloc(32);
+    TEST_ASSERT_NOT_NULL(other);
+    lv_memset(other, 0x5A, 32);
+    for(size_t i = 0; i < len; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0xA5, buf[i]);
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+
+    lv_free(other);
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_mem_test(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    uint32_t mem = lv_test_get_free_mem();
+    uint32_t * zero_mem = lv_malloc_zeroed(0);
+    TEST_ASSERT_NOT_NULL(zero_mem);
+
+    /* Test magic value */
+    TEST_ASSERT_EQUAL_UINT32(ZERO_MEM_SENTINEL, *zero_mem);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+
+    /* Test wrong memory, test should fail */
+    *zero_mem = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_mem_test());
+
+    /* Restore magic value */
+    *zero_mem = ZERO_MEM_SENTINEL;
+    lv_free(zero_mem);
+
+    /* Re-verify zero memory */
+    uint32_t * new_zero_mem = lv_malloc_zeroed(0);
+    TEST_ASSERT_EQUAL_UINT32(ZERO_MEM_SENTINEL, *new_zero_mem);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+    lv_free(new_zero_mem);
+
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 #endif
 }
 

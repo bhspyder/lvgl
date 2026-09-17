@@ -64,6 +64,7 @@ def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_priva
                         'LV_USE_BMP',
                         'LV_USE_TJPGD',
                         'LV_USE_LIBJPEG_TURBO',
+                        'LV_USE_LIBWEBP',
                         'LV_USE_GIF',
                         'LV_BIN_DECODER_RAM_LOAD',
                         'LV_USE_RLE',
@@ -303,7 +304,7 @@ if __name__ == '__main__':
         help=(
             "path to a custom header file. When using this to supply a custom"
             "header file you MUST insure that any LVGL includes are done so "
-            "they are relitive to the LVGL repository root folder.\n\n"
+            "they are relative to the LVGL repository root folder.\n\n"
             '#include "src/lvgl_private.h"\n\n'
             "If you have includes to header files that are not LVGL then you "
             "will need to add the include locations for those header files "

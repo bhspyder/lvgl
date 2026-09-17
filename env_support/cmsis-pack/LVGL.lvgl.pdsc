@@ -23,7 +23,7 @@
 <package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
   <vendor>LVGL</vendor>
   <name>lvgl</name>
-  <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
+  <description>LVGL is a free and open-source UI library that enables you to create graphical user interfaces for any MCUs and MPUs from any vendor on any platform.</description>
   <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
   <supportContact>https://github.com/lvgl/lvgl/issues/new/choose</supportContact>
   <license>LICENCE.txt</license>
@@ -36,7 +36,15 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-10-16" version="9.4.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
+    <release date="2026-09-16" version="9.6.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.6.0.pack">
+      - LVGL 9.6.0
+      - See Change Log
+    </release>
+    <release date="2026-02-18" version="9.5.0" url="https://github.com/lvgl/lvgl/raw/v9.5.0/env_support/cmsis-pack/LVGL.lvgl.9.5.0.pack">
+      - LVGL 9.5.0
+      - See Change Log
+    </release>
+    <release date="2025-10-16" version="9.4.0" url="https://github.com/lvgl/lvgl/raw/v9.4.0/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
       - LVGL 9.4.0
       - See Change Log
     </release>
@@ -215,6 +223,11 @@
             <accept  Dcore="Cortex-A73"/>
         </condition>
 
+        <condition id="Armv7E-M Processors">
+            <accept  Dcore="Cortex-M7"/>
+            <accept  Dcore="Cortex-M4"/>
+        </condition>
+
         <condition id="Armv8-M Mainline Processors">
             <accept  Dcore="ARMV81MML"/>
             
@@ -226,9 +239,33 @@
             <accept  Dcore="Cortex-M52"/>
         </condition>
         
-        
+        <condition id="Armv8.1-M Mainline Processors">
+            <accept  Dcore="ARMV81MML"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="Cortex-M85"/>
+            <accept  Dcore="Cortex-M52"/>
+        </condition>
+
+        <condition id="Armv7E-M Library">
+            <require condition="Armv7E-M Processors" />
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+            <accept Tcompiler="GCC"/>
+            <accept Tcompiler="CLANG"/>
+            <accept Tcompiler="IAR"/>
+        </condition>
+
         <condition id="Armv8-M Mainline Library">
             <require condition="Armv8-M Mainline Processors" />
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+            <accept Tcompiler="GCC"/>
+            <accept Tcompiler="CLANG"/>
+            <accept Tcompiler="IAR"/>
+        </condition>
+        
+        <condition id="Armv8.1-M Mainline Library">
+            <require condition="Armv8.1-M Mainline Processors" />
             <accept Tcompiler="ARMCC" Toptions="AC6"/>
             <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
             <accept Tcompiler="GCC"/>
@@ -293,6 +330,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
 
         <condition id="LVGL-GPU-SWM341-DMA2D">
@@ -309,6 +347,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-PXP">
@@ -325,6 +364,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-G2D">
@@ -341,6 +381,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-VGLite">
@@ -357,6 +398,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
 
         <condition id="LVGL-GPU-GD32-IPA">
@@ -373,6 +415,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
         
         <condition id="LVGL-GPU-Renesas-Dave2D">
@@ -389,6 +432,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
         
         <condition id="LVGL-GPU-NEMA-GFX">
@@ -405,6 +449,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
         <condition id="LVGL-GPU-ESP-PPA">
             <description>Condition for the ESP PPA Accelerator</description>
@@ -420,6 +465,7 @@
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
         </condition>
         <condition id="LVGL-GPU-EVE-FT81X">
             <description>Condition for EVE FT81X GPU</description>
@@ -435,16 +481,35 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>
+        </condition>
+        <condition id="LVGL-GPU-SiFli-EPIC">
+            <description>Condition for SiFli EPIC GPU</description>
+            <require condition="LVGL-Essential"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-G2D" />
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU ESP-PPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU EVE-FT81X"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SiFli-EPIC"/>-->
         </condition>
     </conditions>
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.4.0">
-            <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.6.0">
+            <description>LVGL is a free and open-source UI library that enables you to create graphical user interfaces for any MCUs and MPUs from any vendor on any platform.</description>
             <doc></doc>
             <component Cgroup="Essential">
               <description>The Essential services of LVGL (without extra content)</description>
               <files>
+              
+                <file category="include"            name="include/" />
               
                 <!-- src -->
                 <file category="sourceC"            name="src/lv_init.c" />
@@ -463,12 +528,13 @@
                 <file category="sourceC"            name="src/core/lv_obj_style.c" />
                 <file category="sourceC"            name="src/core/lv_obj_style_gen.c" />
                 <file category="sourceC"            name="src/core/lv_obj_tree.c" />
+                <file category="sourceC"            name="src/core/lv_observer.c" />
                 <file category="sourceC"            name="src/core/lv_refr.c" />
                 
                 <!-- src/drivers -->
                 <file category="sourceC"            name="src/drivers/evdev/lv_evdev.c" />
                 
-                <file category="sourceC"            name="src/drivers/display/lcd/lv_lcd_generic_mipi.c" />
+                <file category="sourceC"            name="src/drivers/display/mipi/lv_lcd_generic_mipi.c" />
                 
                 <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_entry.c" />
                 <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_cache.c" />
@@ -483,6 +549,9 @@
                 <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mouse.c" />
                 <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mousewheel.c" />
                 <file category="sourceC"            name="src/drivers/sdl/lv_sdl_window.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_sw.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_egl.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_texture.c" />
                 
                 <file category="sourceC"            name="src/drivers/x11/lv_x11_display.c" />
                 <file category="sourceC"            name="src/drivers/x11/lv_x11_input.c" />
@@ -495,28 +564,32 @@
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_driver.c" />
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_texture.c" />
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_egl.c" />
+                <file category="sourceC"            name="src/drivers/opengles/lv_opengles_pbuffer.c" />
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_glfw.c" />
                 <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_manager.c" />
                 <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_program.c" />
                 <file category="sourceC"            name="src/drivers/opengles/assets/lv_opengles_shader.c" />
                 <file category="sourceC"            name="src/drivers/opengles/glad/src/egl.c" />
                 <file category="sourceC"            name="src/drivers/opengles/glad/src/gles2.c" />
+                <file category="sourceC"            name="src/drivers/opengles/glad/src/gl.c" />
                 
                 <file category="sourceC"            name="src/drivers/qnx/lv_qnx.c" />
                 
                 <file category="sourceC"            name="src/drivers/wayland/lv_wayland.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_smm.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_cache.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_dmabuf.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_keyboard.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_pointer.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_pointer_axis.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_seat.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_shm.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_touch.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_window.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_window_decorations.c" />
-                <file category="sourceC"            name="src/drivers/wayland/lv_wl_xdg_shell.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_backend.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_backend_g2d.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_keyboard.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_pointer.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_seat.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_backend_egl.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_backend_shm.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_backend_dmabuf.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_dmabuf.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_touch.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_window.c" />
+                <file category="sourceC"            name="src/drivers/wayland/lv_wayland_xdg_shell.c" />
+                
+                
                 
                 <file category="sourceC"            name="src/drivers/uefi/lv_uefi_context.c" />
                 <file category="sourceC"            name="src/drivers/uefi/lv_uefi_display.c" />
@@ -536,6 +609,7 @@
                 <file category="sourceC"            name="src/draw/lv_draw_3d.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_buf.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_blur.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_image.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_label.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_line.c" />
@@ -543,14 +617,15 @@
                 <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_vector.c" />
-                <file category="sourceC"            name="src/draw/lv_image_decoder.c" />
+                <file category="sourceC"            name="src/image/lv_image_decoder.c" />
                 
                 <!-- src/draw/sw -->
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_utils.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_utils.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_arc.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_border.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_box_shadow.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_blur.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_fill.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_grad.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_img.c" />
@@ -568,13 +643,21 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_argb8888_premultiplied.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_i1.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_l8.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_a8.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_al88.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565_swapped.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb888.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/sve2/lv_draw_sw_blend_sve2_to_rgb888.c" />
+                
+                
                 <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
+                <file category="sourceC"            name="src/draw/sw/blend/arm2d/lv_blend_arm2d.c" condition="Helium" />
+                
+                <file category="sourceC"            name="src/draw/sw/blend/riscv_v/lv_draw_sw_blend_riscv_v_to_rgb888.c" />
+                
                 
                 <!-- src/draw/sw/convert -->
                 <file category="sourceC"            name="src/draw/convert/lv_draw_buf_convert.c" />
@@ -586,10 +669,10 @@
                 <file category="sourceC"            name="src/draw/opengles/lv_draw_opengles.c" />
 
                 <!-- src/font -->
-                <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
+                <file category="sourceC"            name="src/font/binfont_loader/lv_binfont_loader.c" />
                 <file category="sourceC"            name="src/font/lv_font.c" />
                 <file category="sourceC"            name="src/font/lv_font_dejavu_16_persian_hebrew.c" />
-                <file category="sourceC"            name="src/font/lv_font_fmt_txt.c" />
+                <file category="sourceC"            name="src/font/fmt_txt/lv_font_fmt_txt.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_8.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_10.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_12.c" />
@@ -637,18 +720,22 @@
                 <file category="sourceC"            name="src/misc/lv_array.c" />
                 <file category="sourceC"            name="src/misc/lv_async.c" />
                 <file category="sourceC"            name="src/misc/lv_bidi.c" />
+                <file category="sourceC"            name="src/misc/lv_bidi_common.c" />
+                
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_color_op.c" />
                 <file category="sourceC"            name="src/misc/lv_event.c" />
-                <file category="sourceC"            name="src/misc/lv_fs.c" />
+                
                 <file category="sourceC"            name="src/misc/lv_grad.c" />
                 <file category="sourceC"            name="src/misc/lv_ll.c" />
-                <file category="sourceC"            name="src/misc/lv_log.c" />
+                <file category="sourceC"            name="src/logging/lv_log.c" />
                 <file category="sourceC"            name="src/misc/lv_lru.c" />
                 <file category="sourceC"            name="src/misc/lv_math.c" />
                 <file category="sourceC"            name="src/misc/lv_palette.c" />
-                <file category="sourceC"            name="src/misc/lv_profiler_builtin.c" />
-                <file category="sourceC"            name="src/misc/lv_profiler_builtin_posix.c" />
+                
+
+                
+                <file category="sourceC"            name="src/misc/lv_pending.c" />
                 <file category="sourceC"            name="src/misc/lv_rb.c" />
                 <file category="sourceC"            name="src/misc/lv_style.c" />
                 <file category="sourceC"            name="src/misc/lv_style_gen.c" />
@@ -661,6 +748,14 @@
                 <file category="sourceC"            name="src/misc/lv_iter.c" />
                 <file category="sourceC"            name="src/misc/lv_circle_buf.c" />
                 <file category="sourceC"            name="src/misc/lv_tree.c" />
+                
+                <!-- src/fs/ -->
+                <file category="sourceC"            name="src/fs/lv_fs.c" />
+                
+                
+                <!-- src/debugging/profiler/-->
+                <file category="sourceC"            name="src/debugging/profiler/lv_profiler_builtin.c" />
+                <file category="sourceC"            name="src/debugging/profiler/lv_profiler_builtin_posix.c" />
                 
                 
                 <!-- src/misc/cache-->
@@ -737,10 +832,25 @@
                 <file category="sourceC"            name="src/widgets/win/lv_win.c" />
                 <file category="sourceC"            name="src/widgets/3dtexture/lv_3dtexture.c" />
                 
+                <file category="sourceC"            name="src/widgets/property/lv_arc_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_bar_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_buttonmatrix_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_checkbox_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_chart_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_image_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_obj_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_style_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_scale_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_switch_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_spinbox_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_spinner_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_span_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_table_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_tabview_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_label_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_led_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_line_properties.c" />
+                <file category="sourceC"            name="src/widgets/property/lv_menu_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_keyboard_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_textarea_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_roller_properties.c" />
@@ -749,15 +859,17 @@
                 <file category="sourceC"            name="src/widgets/property/lv_animimage_properties.c" />
 
                 <!-- src/libs -->
-                <file category="sourceC"            name="src/libs/bin_decoder/lv_bin_decoder.c" />
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_cbfs.c" />
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_uefi.c" />
+                <file category="sourceC"            name="src/image/lv_bin_decoder.c" />
+                <file category="sourceC"            name="src/fs/lv_fs_uefi.c" />
                 
-                <!-- src/others -->
-                <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
-                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
-                <file category="sourceC"            name="src/others/vg_lite_tvg/vg_lite_matrix.c" />
-                <file category="sourceCpp"          name="src/others/vg_lite_tvg/vg_lite_tvg.cpp" />
+                <!-- src/debugging -->
+                <file category="sourceC"            name="src/debugging/sysmon/lv_sysmon.c" />
+                <file category="sourceC"            name="src/debugging/test/lv_test_display_egl.c" />
+                
+                <file category="sourceC"            name="src/debugging/vg_lite_tvg/vg_lite_matrix.c" />
+                <file category="sourceCpp"          name="src/debugging/vg_lite_tvg/vg_lite_tvg.cpp" />
+                
+                <!--<file category="sourceC"            name="src/debugging/test/lv_test_fs.c" />-->
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -768,7 +880,7 @@
                 <file category="sourceC"            name="src/osal/lv_linux.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="3.0.0" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="9.6.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -844,7 +956,7 @@
             <component Cgroup="Display" Cvariant="NV3007" condition="LVGL-Essential">
               <description>This driver is just a wrapper around the generic MIPI compatible LCD controller driver</description>
               <files>
-                <file category="sourceC"          name="src/drivers/display/nv3007/lv_nv3007.c" />
+                <file category="sourceC"          name="src/drivers/display/mipi/lv_nv3007.c" />
               </files>
 
               <RTE_Components_h>
@@ -897,7 +1009,7 @@
             <component Cgroup="Display" Cvariant="ILI9341" condition="LVGL-Essential">
               <description>Add the display driver for ILI9341 </description>
               <files>
-                <file category="sourceC"            name="src/drivers/display/ili9341/lv_ili9341.c" />
+                <file category="sourceC"            name="src/drivers/display/mipi/lv_ili9341.c" />
               </files>
 
               <RTE_Components_h>
@@ -910,7 +1022,7 @@
             <component Cgroup="Display" Cvariant="st7735" condition="LVGL-Essential">
               <description>Add the display driver for st7735 </description>
               <files>
-                <file category="sourceC"            name="src/drivers/display/st7735/lv_st7735.c" />
+                <file category="sourceC"            name="src/drivers/display/mipi/lv_st7735.c" />
               </files>
 
               <RTE_Components_h>
@@ -923,7 +1035,7 @@
             <component Cgroup="Display" Cvariant="st7789" condition="LVGL-Essential">
               <description>Add the display driver for st7789 </description>
               <files>
-                <file category="sourceC"            name="src/drivers/display/st7789/lv_st7789.c" />
+                <file category="sourceC"            name="src/drivers/display/mipi/lv_st7789.c" />
               </files>
 
               <RTE_Components_h>
@@ -936,7 +1048,7 @@
             <component Cgroup="Display" Cvariant="st7796" condition="LVGL-Essential">
               <description>Add the display driver for st7796 </description>
               <files>
-                <file category="sourceC"            name="src/drivers/display/st7796/lv_st7796.c" />
+                <file category="sourceC"            name="src/drivers/display/mipi/lv_st7796.c" />
               </files>
 
               <RTE_Components_h>
@@ -1159,6 +1271,29 @@
 
             </component>
 
+            <component Cgroup="Acceleration" Csub="GPU SiFli-EPIC"  condition="LVGL-GPU-SiFli-EPIC">
+              <description>An hardware acceleration from SiFli EPIC</description>
+              <files>
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_buf_sifli_epic.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic_border.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic_fill.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic_img.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic_label.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_draw_sifli_epic_layer.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_sifli_epic_cfg.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_sifli_epic_osa.c" />
+                <file category="sourceC"      name="src/draw/sifli/epic/lv_sifli_epic_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use SiFli EPIC */
+#define LV_USE_SIFLI_EPIC     1
+              </RTE_Components_h>
+            </component>
+
+
             <component Cgroup="Acceleration" Csub="GPU Renesas-Dave2D"  condition="LVGL-GPU-Renesas-Dave2D">
               <description>An hardware acceleration from Renesas Dave2D</description>
               <files>
@@ -1284,6 +1419,7 @@
                 <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_triangle.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_vector.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_bitmap_font_cache.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_decoder.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_math.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_path.c" />
@@ -1331,6 +1467,42 @@
               </RTE_Components_h>
 
             </component>
+            
+            
+            <component Cgroup="Acceleration" Csub="GPU NanoVG"  condition="LVGL-Essential">
+              <description>NanoVG is a lightweight, antialiased 2D vector graphics library built on top of OpenGL/OpenGL ES.</description>
+              <files>
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_3d.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_arc.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_blur.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_border.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_box_shadow.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_fill.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_grad.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_image.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_label.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_layer.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_line.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_mask_rect.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_triangle.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_draw_nanovg_vector.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_nanovg_fbo_cache.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_nanovg_image_cache.c" />
+                <file category="sourceC"      name="src/draw/nanovg/lv_nanovg_utils.c" />
+                
+                <file category="sourceC"      name="src/libs/nanovg/nanovg.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable NanoVG */
+#define LV_USE_DRAW_NANOVG      1
+#define LV_USE_NANOVG           1
+              </RTE_Components_h>
+
+            </component>
+            
 
             <component Cgroup="Acceleration" Csub="GPU NemaGFX"  Cvariant="libnemagfx-float-abi-hard-wc16" isDefaultVariant="true" condition="LVGL-GPU-NEMA-GFX">
               <description>TSi's aka (Think Silicon) NemaGFX</description>
@@ -1339,6 +1511,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_nema_gfx_path.c" />
                 
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1371,6 +1544,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_nema_gfx_path.c" />
                 
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1402,6 +1576,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_nema_gfx_path.c" />
                 
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1432,6 +1607,7 @@
               <files>
                 <!-- src/draw/nema_gfx/ -->
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1462,6 +1638,7 @@
               <files>
                 <!-- src/draw/nema_gfx/ -->
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1491,6 +1668,7 @@
               <files>
                 <!-- src/draw/nema_gfx/ -->
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1520,6 +1698,7 @@
               <files>
                 <!-- src/draw/nema_gfx/ -->
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1550,6 +1729,7 @@
               <files>
                 <!-- src/draw/nema_gfx/ -->
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
@@ -1573,6 +1753,249 @@
               </RTE_Components_h>
 
             </component>
+            
+            
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm55-nemagfx-float-abi-hard-wc16" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m55/gcc/libnemagfx-float-abi-hard-wc16.a" condition="Armv8.1-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+            
+            
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm55-nemagfx-float-abi-hard" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m55/gcc/libnemagfx-float-abi-hard.a" condition="Armv8.1-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>     
+          
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm55-nemagfx-wc16" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m55/gcc/libnemagfx-wc16.a" condition="Armv8.1-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>   
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm55-nemagfx" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m55/gcc/libnemagfx.a" condition="Armv8.1-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component> 
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm7-nemagfx-float-abi-hard-wc16" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m7/gcc/libnemagfx-float-abi-hard-wc16.a" condition="Armv7E-M Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+            
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm7-nemagfx-float-abi-hard" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m7/gcc/libnemagfx-float-abi-hard.a" condition="Armv7E-M Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm7-nemagfx-wc16" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m7/gcc/libnemagfx-wc16.a" condition="Armv7E-M Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="cm7-nemagfx" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_cache.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m7/gcc/libnemagfx.a" condition="Armv7E-M Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+
             <!-- not available yet 
             <component Cgroup="Acceleration" Csub="GPU Arm-2D"  isDefaultVariant="true" Cversion="2.0.0">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
@@ -1591,43 +2014,15 @@
 
             -->
             
-            <!--
-            <component Cgroup="LVGL9" Csub="PikaScript Binding" Cversion="0.2.0" condition="LVGL-Essential">
-              <description>Add the binding for PikaScript, an ultra-light-weight python VM.</description>
-              <files>
-                <file category="doc"        name="pikascript/README.md"/>
-                <file category="sourceC"    name="pikascript/pika_lvgl.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_indev_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_event.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_obj.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_style_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_point_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_timer_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_wegit.c" />
-              </files>
-              <Pre_Include_Local_Component_h>
-
-/* enabling PikaScript Binding */
-#define PIKASCRIPT     1
-              </Pre_Include_Local_Component_h>
-              <RTE_Components_h>
-
-/*! \brief enable PikaScript Binding */
-#define LV_USE_PIKASCRIPT_BINDING          1
-              </RTE_Components_h>
-
-            </component>
-            -->
-            
             <component Cgroup="Libraries and Others" Csub="Libs SVG"  condition="LVGL-Essential">
               <description>Add the SVG library</description>
               <files>
                 <!-- src/libs/svg -->
-                <file category="sourceC"    name="src/libs/svg/lv_svg.c" />
-                <file category="sourceC"    name="src/libs/svg/lv_svg_decoder.c" />
-                <file category="sourceC"    name="src/libs/svg/lv_svg_parser.c" />
-                <file category="sourceC"    name="src/libs/svg/lv_svg_render.c" />
-                <file category="sourceC"    name="src/libs/svg/lv_svg_token.c" />
+                <file category="sourceC"    name="src/image/svg/lv_svg.c" />
+                <file category="sourceC"    name="src/image/svg/lv_svg_decoder.c" />
+                <file category="sourceC"    name="src/image/svg/lv_svg_parser.c" />
+                <file category="sourceC"    name="src/image/svg/lv_svg_render.c" />
+                <file category="sourceC"    name="src/image/svg/lv_svg_token.c" />
               </files>
 
               <RTE_Components_h>
@@ -1643,7 +2038,7 @@
               <description>Add the GStreamer library</description>
               <files>
                 <!-- src/libs/gstreamer -->
-                <file category="sourceC"    name="src/libs/gstreamer/lv_gstreamer.c" />
+                <file category="sourceC"    name="src/widgets/gstreamer/lv_gstreamer.c" />
               </files>
 
               <RTE_Components_h>
@@ -1659,7 +2054,7 @@
               <description>Add the Barcode code library</description>
               <files>
                 <!-- src/libs/barcode -->
-                <file category="sourceC"    name="src/libs/barcode/lv_barcode.c" />
+                <file category="sourceC"    name="src/widgets/barcode/lv_barcode.c" />
                 <file category="sourceC"    name="src/libs/barcode/code128.c" />
               </files>
 
@@ -1675,7 +2070,7 @@
               <description>Add BMP decoder library</description>
               <files>
                 <!-- src/libs/bmp -->
-                <file category="sourceC"    name="src/libs/bmp/lv_bmp.c" />
+                <file category="sourceC"    name="src/image/lv_bmp.c" />
               </files>
 
               <RTE_Components_h>
@@ -1712,7 +2107,7 @@
               <description>Add FFmpeg library for image decoding and playing videos, an extra librbary is required.</description>
               <files>
                 <!-- src/libs/ffmpeg -->
-                <file category="sourceC"    name="src/libs/ffmpeg/lv_ffmpeg.c" />
+                <file category="sourceC"    name="src/widgets/ffmpeg/lv_ffmpeg.c" />
               </files>
 
               <RTE_Components_h>
@@ -1726,11 +2121,12 @@
             <component Cgroup="Libraries and Others" Csub="Libs freetype"  condition="LVGL-Essential">
               <description>Add FreeType library, an extra librbary is required.</description>
               <files>
-                <!-- src/libs/freetype -->
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_image.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_outline.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
+                <!-- src/font/freetype -->
+                <file category="sourceC"    name="src/font/freetype/lv_freetype.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_glyph.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_image.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_outline.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_ftsystem.c" />
               </files>
 
               <RTE_Components_h>
@@ -1745,8 +2141,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="FATFS" condition="LVGL-Essential">
               <description>Add API for FATFS (needs to be added separately). Uses f_open, f_read, etc</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_fatfs.c" />
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_fatfs.c" />
               </files>
 
               <RTE_Components_h>
@@ -1760,8 +2156,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Memory-Mapped Files" isDefaultVariant="true" condition="LVGL-Essential">
               <description>Add API for memory-mapped file access.</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_memfs.c" />
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_memfs.c" />
               </files>
 
               <RTE_Components_h>
@@ -1775,8 +2171,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="POSIX" condition="LVGL-Essential">
               <description>Add API for file access via POSIX</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_posix.c" />
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_posix.c" />
               </files>
 
               <RTE_Components_h>
@@ -1790,8 +2186,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="STDIO" condition="LVGL-Essential">
               <description>Add API for file access via STDIO</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_stdio.c" />
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_stdio.c" />
               </files>
 
               <RTE_Components_h>
@@ -1805,8 +2201,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="LittleFs" condition="LVGL-Essential">
               <description>Add API for file access via LittleFs</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_littlefs.c" />
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_littlefs.c" />
               </files>
 
               <RTE_Components_h>
@@ -1823,9 +2219,9 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Arduino LittleFs" condition="LVGL-Essential">
               <description>Add API for file access via Arduino LittleFs</description>
               <files>
-                <!-- src/libs/fsdrv -->
-                <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp" />
-                <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_sd.cpp" />
+                <!-- src/fs/ -->
+                <file category="sourceCpp"    name="src/fs/lv_fs_arduino_esp_littlefs.cpp" />
+                <file category="sourceCpp"    name="src/fs/lv_fs_arduino_sd.cpp" />
               </files>
 
               <RTE_Components_h>
@@ -1843,7 +2239,7 @@
               <files>
                 <file category="sourceC"    name="src/libs/frogfs/src/decomp_raw.c" />
                 <file category="sourceC"    name="src/libs/frogfs/src/frogfs.c" />
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_frogfs.c" />
+                <file category="sourceC"    name="src/fs/lv_fs_frogfs.c" />
               </files>
 
               <RTE_Components_h>
@@ -1857,8 +2253,8 @@
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="WIN32" condition="LVGL-Essential">
               <description>Add API for file access via STDIO</description>
               <files>
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_cbfs.c" />
-                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_win32.c" />
+                <file category="sourceC"    name="src/fs/lv_fs_cbfs.c" />
+                <file category="sourceC"    name="src/fs/lv_fs_win32.c" />
               </files>
 
               <RTE_Components_h>
@@ -1874,8 +2270,8 @@
               <description>Add GIF support</description>
               <files>
                 <!-- src/libs/gif -->
-                <file category="sourceC"    name="src/libs/gif/lv_gif.c" />
-                <file category="sourceC"    name="src/libs/gif/AnimatedGIF/src/gif.c" />
+                <file category="sourceC"    name="src/widgets/gif/lv_gif.c" />
+                <file category="sourceC"    name="src/libs/gif/gif.c" />
               </files>
 
               <RTE_Components_h>
@@ -1885,12 +2281,28 @@
               </RTE_Components_h>
 
             </component>
+            
+            <component Cgroup="Libraries and Others" Csub="Libs WebP"  condition="LVGL-Essential">
+              <description>Add WebP support</description>
+              <files>
+                <!-- src/libs/libwebp -->
+                <file category="sourceC"    name="src/image/lv_libwebp.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable WebP decoder library */
+#define LV_USE_LIBWEBP      1
+              </RTE_Components_h>
+
+            </component>
+
 
             <component Cgroup="Libraries and Others" Csub="Libs libjpeg-turbo decoder"  condition="LVGL-Essential">
               <description>Add libjpeg-turbo decoder library</description>
               <files>
                 <!-- src/libs/libjpeg_turbo -->
-                <file category="sourceC"    name="src/libs/libjpeg_turbo/lv_libjpeg_turbo.c" />
+                <file category="sourceC"    name="src/image/lv_libjpeg_turbo.c" />
               </files>
 
               <RTE_Components_h>
@@ -1905,7 +2317,7 @@
               <description>Add PNG decoder(libpng) library</description>
               <files>
                 <!-- src/libs/png -->
-                <file category="sourceC"    name="src/libs/libpng/lv_libpng.c" />
+                <file category="sourceC"    name="src/image/lv_libpng.c" />
               </files>
 
               <RTE_Components_h>
@@ -1921,7 +2333,7 @@
               <files>
                 <!-- src/libs/lodepng -->
                 <file category="sourceC"    name="src/libs/lodepng/lodepng.c" />
-                <file category="sourceC"    name="src/libs/lodepng/lv_lodepng.c" />
+                <file category="sourceC"    name="src/image/lv_lodepng.c" />
               </files>
 
               <RTE_Components_h>
@@ -1953,7 +2365,7 @@
               <description>Add QR code library</description>
               <files>
                 <!-- src/libs/qrcode -->
-                <file category="sourceC"    name="src/libs/qrcode/lv_qrcode.c" />
+                <file category="sourceC"    name="src/widgets/qrcode/lv_qrcode.c" />
                 <file category="sourceC"    name="src/libs/qrcode/qrcodegen.c" />
               </files>
 
@@ -2059,53 +2471,56 @@
             </component>
 
 
+        <!--
             <component Cgroup="Libraries and Others" Csub="XML"  condition="LVGL-Essential">
               <description>Add XML UIs runtime</description>
               <files>
-                <!-- src/libs/expat -->
+                
                 <file category="sourceC"    name="src/libs/expat/xmlparse.c" />
                 <file category="sourceC"    name="src/libs/expat/xmlrole.c" />
                 <file category="sourceC"    name="src/libs/expat/xmltok.c" />
                 <file category="sourceC"    name="src/libs/expat/xmltok_impl.c" />
                 <file category="sourceC"    name="src/libs/expat/xmltok_ns.c" />
                 
-                <!-- src/others/xml -->
-                <file category="sourceC"    name="src/others/xml/lv_xml.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_load.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_base_types.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_component.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_parser.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_style.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_test.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_utils.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_update.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_widget.c" />
-                <file category="sourceC"    name="src/others/xml/lv_xml_translation.c" />
                 
-                <!-- src/others/xml/parsers -->
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_arc_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_switch_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_bar_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_button_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_buttonmatrix_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_chart_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_checkbox_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_calendar_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_canvas_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_dropdown_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_image_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_keyboard_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_label_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_obj_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_roller_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_slider_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_scale_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_spangroup_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_table_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_tabview_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_textarea_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_qrcode_parser.c" />
-                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_spinbox_parser.c" />
+                <file category="sourceC"    name="src/xml/lv_xml.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_load.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_base_types.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_component.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_parser.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_style.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_test.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_utils.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_update.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_widget.c" />
+                <file category="sourceC"    name="src/xml/lv_xml_translation.c" />
+                
+                
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_arc_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_switch_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_bar_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_button_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_buttonmatrix_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_chart_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_checkbox_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_calendar_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_canvas_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_dropdown_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_image_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_imagebutton_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_keyboard_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_label_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_obj_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_roller_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_slider_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_scale_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_spangroup_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_spinner_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_table_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_tabview_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_textarea_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_qrcode_parser.c" />
+                <file category="sourceC"    name="src/xml/parsers/lv_xml_spinbox_parser.c" />
               </files>
 
               <RTE_Components_h>
@@ -2113,17 +2528,14 @@
 /** Enable loading XML UIs runtime */
 #define LV_USE_XML	1
               </RTE_Components_h>
-
             </component>
-
-
-
+        -->
 
             <component Cgroup="Libraries and Others" Csub="Tiny TTF"  condition="LVGL-Essential">
               <description>Add Built-in TTF decoder</description>
               <files>
-                <!-- src/libs/tiny_ttf -->
-                <file category="sourceC"    name="src/libs/tiny_ttf/lv_tiny_ttf.c" />
+                <!-- src/font/tiny_ttf -->
+                <file category="sourceC"    name="src/font/tiny_ttf/lv_tiny_ttf.c" />
                 
               </files>
 
@@ -2139,7 +2551,7 @@
               <description>Add JPG + split JPG decoder library. Split JPG is a custom format optimized for embedded systems.</description>
               <files>
                 <!-- src/libs/tjpgd -->
-                <file category="sourceC"    name="src/libs/tjpgd/lv_tjpgd.c" />
+                <file category="sourceC"    name="src/image/lv_tjpgd.c" />
                 <file category="sourceC"    name="src/libs/tjpgd/tjpgd.c" />
               </files>
 
@@ -2201,8 +2613,8 @@
             <component Cgroup="Libraries and Others" Csub="Grid Navigation"  condition="LVGL-Essential">
               <description>Add the Grid Navigation service</description>
               <files>
-                <!-- src/others/gridnav -->
-                <file category="sourceC"            name="src/others/gridnav/lv_gridnav.c" />
+                <!-- src/indev/ -->
+                <file category="sourceC"            name="src/indev/lv_gridnav.c" />
               </files>
 
               <RTE_Components_h>
@@ -2216,8 +2628,8 @@
             <component Cgroup="Libraries and Others" Csub="IME Pinyin"  condition="LVGL-Essential">
               <description>Add Pinyin input method</description>
               <files>
-                <!-- src/others/ime -->
-                <file category="sourceC"            name="src/others/ime/lv_ime_pinyin.c" />
+                <!-- src/widgets/ime -->
+                <file category="sourceC"            name="src/widgets/ime/lv_ime_pinyin.c" />
               </files>
 
               <RTE_Components_h>
@@ -2231,8 +2643,8 @@
             <component Cgroup="Libraries and Others" Csub="Image Font"  condition="LVGL-Essential">
               <description>Add Support for using images as font in label or span widgets</description>
               <files>
-                <!-- src/others/imgfont -->
-                <file category="sourceC"            name="src/others/imgfont/lv_imgfont.c" />
+                <!-- src/font/imgfont -->
+                <file category="sourceC"            name="src/font/imgfont/lv_imgfont.c" />
               </files>
 
               <RTE_Components_h>
@@ -2247,9 +2659,9 @@
             <component Cgroup="Libraries and Others" Csub="Font Manager"  condition="LVGL-Essential">
               <description>Add the support for freetype font manager</description>
               <files>
-                <!-- src/others/font_manager -->
-                <file category="sourceC"            name="src/others/font_manager/lv_font_manager.c" />
-                <file category="sourceC"            name="src/others/font_manager/lv_font_manager_recycle.c" />
+                <!-- src/font/font_manager -->
+                <file category="sourceC"            name="src/font/font_manager/lv_font_manager.c" />
+                <file category="sourceC"            name="src/font/font_manager/lv_font_manager_recycle.c" />
               </files>
 
               <RTE_Components_h>
@@ -2263,8 +2675,8 @@
             <component Cgroup="Libraries and Others" Csub="Monkey"  condition="LVGL-Essential">
               <description>Add the Monkey test service</description>
               <files>
-                <!-- src/others/monkey -->
-                <file category="sourceC"            name="src/others/monkey/lv_monkey.c" />
+                <!-- src/debugging/monkey -->
+                <file category="sourceC"            name="src/debugging/monkey/lv_monkey.c" />
               </files>
 
               <RTE_Components_h>
@@ -2279,25 +2691,26 @@
               <description>Add glTF (GL Transmission Format) support </description>
               <files>
                 <!-- src/others/gltf -->
-                <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_bind.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_animations.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_cache.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_injest.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_mesh.cpp" />
-                <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_node.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_primitive.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_shader.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_skin.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_texture.cpp" />
+                <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_model_node.cpp" />
+                <file category="sourceC"              name="src/libs/gltf/gltf_data/lv_gltf_model_loader.c" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_uniform_locations.cpp" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/lv_gltf_view_shader.c" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/chromatic.c" />
-                <file category="sourceC"              name="src/libs/gltf/gltf_view/ibl/lv_gltf_ibl_sampler.c" />
+                <file category="sourceC"              name="src/libs/gltf/gltf_environment/lv_gltf_ibl_sampler.c" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view_render.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view_shader.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/math/lv_gltf_math.cpp" />
+                <file category="sourceC"              name="src/libs/gltf/math/lv_3dmath.c" />
               </files>
 
               <RTE_Components_h>
@@ -2312,8 +2725,8 @@
             <component Cgroup="Libraries and Others" Csub="Snapshot"  condition="LVGL-Essential">
               <description>Add the API to take snapshot for object</description>
               <files>
-                <!-- src/others/snapshot -->
-                <file category="sourceC"            name="src/others/snapshot/lv_snapshot.c" />
+                <!-- src/draw/snapshot -->
+                <file category="sourceC"            name="src/draw/snapshot/lv_snapshot.c" />
               </files>
 
               <RTE_Components_h>

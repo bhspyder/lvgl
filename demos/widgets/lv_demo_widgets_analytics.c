@@ -24,6 +24,8 @@
  **********************/
 
 static void scale1_indic1_anim_cb(void * var, int32_t v);
+static void scale1_indic2_anim_cb(void * var, int32_t v);
+static void scale1_indic3_anim_cb(void * var, int32_t v);
 static void scale2_timer_cb(lv_timer_t * timer);
 static void scale3_anim_cb(void * var, int32_t v);
 static void scale3_size_changed_event_cb(lv_event_t * e);
@@ -100,7 +102,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_height(chart2_cont, lv_pct(100));
     lv_obj_set_style_max_height(chart2_cont, 300, 0);
     lv_obj_set_flex_grow(chart2_cont, 1);
-    lv_obj_add_flag(chart2_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(chart2_cont, true);
 
     static const char * chart2_texts[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", NULL};
     chart2 = create_chart_with_scales(chart2_cont, "Monthly revenue", chart2_texts);
@@ -117,13 +119,13 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
 
     /*Create all 3 scales first to have their size resolved*/
     scale1 = create_scale_box(parent, "Monthly Target", "Revenue: -", "Sales: -", "Costs: -");
-    lv_obj_add_flag(lv_obj_get_parent(scale1), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(lv_obj_get_parent(scale1), true);
 
     scale2 = create_scale_box(parent, "Sessions", "Desktop: -", "Tablet: -", "Mobile: -");
-    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(scale2), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    if(disp_size < DISP_LARGE) lv_obj_set_flex_in_new_track(lv_obj_get_parent(scale2), true);
 
     scale3 = create_scale_box(parent, "Network Speed", "Low speed", "Normal Speed", "High Speed");
-    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(scale3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    if(disp_size < DISP_LARGE) lv_obj_set_flex_in_new_track(lv_obj_get_parent(scale3), true);
 
     lv_obj_update_layout(parent);
     int32_t scale_w;
@@ -156,7 +158,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
@@ -171,10 +173,10 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
     lv_obj_center(arc);
 
-    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_exec_cb(&a, scale1_indic2_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2600);
     lv_anim_set_reverse_duration(&a, 3200);
@@ -187,10 +189,10 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
     lv_obj_center(arc);
 
-    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_exec_cb(&a, scale1_indic3_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2800);
     lv_anim_set_reverse_duration(&a, 1800);
@@ -211,7 +213,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 10, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
     lv_obj_center(arc);
 
     arc = lv_arc_create(scale2);
@@ -223,7 +225,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
     lv_obj_center(arc);
 
     arc = lv_arc_create(scale2);
@@ -234,7 +236,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(arc, false);
     lv_obj_center(arc);
 
     lv_timer_t * scale2_timer = lv_timer_create(scale2_timer_cb, 100, scale2);
@@ -355,6 +357,24 @@ static void scale1_indic1_anim_cb(void * var, int32_t v)
     lv_obj_t * card = lv_obj_get_parent(scale1);
     lv_obj_t * label = lv_obj_get_child(card, -5);
     lv_label_set_text_fmt(label, "Revenue: %"LV_PRId32" %%", v);
+}
+
+static void scale1_indic2_anim_cb(void * var, int32_t v)
+{
+    lv_arc_set_value(var, v);
+
+    lv_obj_t * card = lv_obj_get_parent(scale1);
+    lv_obj_t * label = lv_obj_get_child(card, -3);
+    lv_label_set_text_fmt(label, "Sales: %"LV_PRId32" %%", v);
+}
+
+static void scale1_indic3_anim_cb(void * var, int32_t v)
+{
+    lv_arc_set_value(var, v);
+
+    lv_obj_t * card = lv_obj_get_parent(scale1);
+    lv_obj_t * label = lv_obj_get_child(card, -1);
+    lv_label_set_text_fmt(label, "Costs: %"LV_PRId32" %%", v);
 }
 
 static void scale2_timer_cb(lv_timer_t * timer)
@@ -542,8 +562,12 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_obj_set_scroll_dir(wrapper, LV_DIR_HOR);
 
     lv_obj_t * chart = lv_chart_create(wrapper);
-    lv_group_add_obj(lv_group_get_default(), chart);
-    lv_obj_add_flag(chart, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_group_t * group = lv_group_get_default();
+    if(group) {
+        lv_group_add_obj(group, chart);
+    }
+    lv_obj_set_scroll_on_focus(chart, true);
+    lv_obj_set_send_draw_task_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 12);
     lv_chart_set_point_count(chart, 12);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
@@ -584,45 +608,51 @@ static void chart_event_cb(lv_event_t * e)
             lv_obj_get_coords(obj, &obj_coords);
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+            lv_point_precise_t p1;
+            lv_point_precise_t p2;
+            int32_t i;
+            for(i = 0; i < draw_line_dsc->point_cnt - 1; i++) {
+                p1 = draw_line_dsc->points[i];
+                p2 = draw_line_dsc->points[i + 1];
+                lv_draw_triangle_dsc_t tri_dsc;
+                lv_draw_triangle_dsc_init(&tri_dsc);
+                tri_dsc.p[0].x = (int32_t)p1.x;
+                tri_dsc.p[0].y = (int32_t)p1.y;
+                tri_dsc.p[1].x = (int32_t)p2.x;
+                tri_dsc.p[1].y = (int32_t)p2.y;
+                tri_dsc.p[2].x = (int32_t)(p1.y < p2.y ? p1.x : p2.x);
+                tri_dsc.p[2].y = (int32_t)LV_MAX(p1.y, p2.y);
+                tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
-            lv_draw_triangle_dsc_t tri_dsc;
-            lv_draw_triangle_dsc_init(&tri_dsc);
-            tri_dsc.p[0].x = (int32_t)draw_line_dsc->p1.x;
-            tri_dsc.p[0].y = (int32_t)draw_line_dsc->p1.y;
-            tri_dsc.p[1].x = (int32_t)draw_line_dsc->p2.x;
-            tri_dsc.p[1].y = (int32_t)draw_line_dsc->p2.y;
-            tri_dsc.p[2].x = (int32_t)(draw_line_dsc->p1.y < draw_line_dsc->p2.y ? draw_line_dsc->p1.x : draw_line_dsc->p2.x);
-            tri_dsc.p[2].y = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-            tri_dsc.grad.dir = LV_GRAD_DIR_VER;
+                int32_t full_h = lv_obj_get_height(obj);
+                int32_t fract_upper = (int32_t)(LV_MIN(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
+                int32_t fract_lower = (int32_t)(LV_MAX(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
+                tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
+                tri_dsc.grad.stops[0].opa = 255 - fract_upper;
+                tri_dsc.grad.stops[0].frac = 0;
+                tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
+                tri_dsc.grad.stops[1].opa = 255 - fract_lower;
+                tri_dsc.grad.stops[1].frac = 255;
 
-            int32_t full_h = lv_obj_get_height(obj);
-            int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
-            int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
-            tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.grad.stops[0].opa = 255 - fract_uppter;
-            tri_dsc.grad.stops[0].frac = 0;
-            tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.grad.stops[1].opa = 255 - fract_lower;
-            tri_dsc.grad.stops[1].frac = 255;
+                lv_draw_triangle(base_dsc->layer, &tri_dsc);
 
-            lv_draw_triangle(base_dsc->layer, &tri_dsc);
+                lv_draw_rect_dsc_t rect_dsc;
+                lv_draw_rect_dsc_init(&rect_dsc);
+                rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+                rect_dsc.bg_grad.stops[0].color = lv_chart_get_series_color(obj, ser);
+                rect_dsc.bg_grad.stops[0].frac = 0;
+                rect_dsc.bg_grad.stops[0].opa = 255 - fract_lower;
+                rect_dsc.bg_grad.stops[1].color = lv_chart_get_series_color(obj, ser);
+                rect_dsc.bg_grad.stops[1].frac = 255;
+                rect_dsc.bg_grad.stops[1].opa = 0;
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
-            rect_dsc.bg_grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-            rect_dsc.bg_grad.stops[0].frac = 0;
-            rect_dsc.bg_grad.stops[0].opa = 255 - fract_lower;
-            rect_dsc.bg_grad.stops[1].color = lv_chart_get_series_color(obj, ser);
-            rect_dsc.bg_grad.stops[1].frac = 255;
-            rect_dsc.bg_grad.stops[1].opa = 0;
-
-            lv_area_t rect_area;
-            rect_area.x1 = (int32_t)draw_line_dsc->p1.x;
-            rect_area.x2 = (int32_t)draw_line_dsc->p2.x;
-            rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-            rect_area.y2 = (int32_t)obj_coords.y2;
-            lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+                lv_area_t rect_area;
+                rect_area.x1 = (int32_t)p1.x;
+                rect_area.x2 = (int32_t)p2.x;
+                rect_area.y1 = (int32_t)LV_MAX(p1.y, p2.y);
+                rect_area.y2 = (int32_t)obj_coords.y2;
+                lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+            }
         }
 
         bool add_value = false;

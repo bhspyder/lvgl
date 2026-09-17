@@ -333,7 +333,7 @@ void test_scale_render_example_7(void)
     lv_scale_set_range(scale, 10, 40);
 
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(scale, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_5.png");
 }
@@ -540,6 +540,219 @@ void test_scale_set_line_needle_value(void)
         provided_points_array[0].x == -100 && provided_points_array[0].y == -100
         && provided_points_array[1].x == -100 && provided_points_array[1].y == -100
     );
+}
+
+void test_scale_needle_updates_when_style_changes(void)
+{
+
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    lv_obj_align(scale, LV_ALIGN_LEFT_MID, 0, 0);
+    lv_obj_set_style_width(scale, 200, LV_PART_MAIN);
+    lv_obj_set_style_height(scale, 200, LV_PART_MAIN);
+
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+
+    lv_scale_set_range(scale, 0, 100);
+    lv_scale_set_angle_range(scale, 270);
+    lv_scale_set_rotation(scale, 135);
+
+    lv_scale_set_total_tick_count(scale, 20);
+    lv_scale_set_major_tick_every(scale, 5);
+
+    lv_obj_t * needle_line = lv_line_create(scale);
+    lv_obj_set_style_line_width(needle_line, 6, LV_PART_MAIN);
+    lv_obj_set_style_line_rounded(needle_line, true, LV_PART_MAIN);
+    lv_scale_set_line_needle_value(scale, needle_line, 60, 26);
+
+    LV_IMAGE_DECLARE(img_hand);
+    lv_obj_t * needle_img = lv_image_create(scale);
+    lv_image_set_src(needle_img, &img_hand);
+    lv_scale_set_image_needle_value(scale, needle_img, 78);
+    lv_obj_align(needle_img, LV_ALIGN_CENTER, 47, -2);
+    lv_image_set_pivot(needle_img, 3, 4);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_7.png");
+
+    lv_obj_align(scale, LV_ALIGN_RIGHT_MID, 0, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_8.png");
+}
+
+void test_scale_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_scale_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_SCALE_MODE;
+    prop.num = LV_SCALE_MODE_ROUND_INNER;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SCALE_MODE_ROUND_INNER, lv_obj_get_property(obj, LV_PROPERTY_SCALE_MODE).num);
+
+    /* Test TOTAL_TICK_COUNT property */
+    prop.id = LV_PROPERTY_SCALE_TOTAL_TICK_COUNT;
+    prop.num = 21;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(21, lv_obj_get_property(obj, LV_PROPERTY_SCALE_TOTAL_TICK_COUNT).num);
+
+    /* Test MAJOR_TICK_EVERY property */
+    prop.id = LV_PROPERTY_SCALE_MAJOR_TICK_EVERY;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(obj, LV_PROPERTY_SCALE_MAJOR_TICK_EVERY).num);
+
+    /* Test LABEL_SHOW property */
+    prop.id = LV_PROPERTY_SCALE_LABEL_SHOW;
+    prop.num = 0;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(0, lv_obj_get_property(obj, LV_PROPERTY_SCALE_LABEL_SHOW).num);
+
+    /* Test ANGLE_RANGE property */
+    prop.id = LV_PROPERTY_SCALE_ANGLE_RANGE;
+    prop.num = 180;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(180, lv_obj_get_property(obj, LV_PROPERTY_SCALE_ANGLE_RANGE).num);
+
+    /* Test ROTATION property */
+    prop.id = LV_PROPERTY_SCALE_ROTATION;
+    prop.num = 90;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(90, lv_obj_get_property(obj, LV_PROPERTY_SCALE_ROTATION).num);
+
+    /* Test RANGE_MIN_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MIN_VALUE;
+    prop.num = -50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(-50, lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MIN_VALUE).num);
+
+    /* Test RANGE_MAX_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MAX_VALUE;
+    prop.num = 150;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(150, lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MAX_VALUE).num);
+
+    lv_obj_delete(obj);
+#endif
+}
+
+void test_scale_with_1_tick(void)
+{
+    /* When the scale has 1 (or less) ticks, only the main part should be drawn,
+     * no ticks nor labels are expected to be drawn. */
+    lv_obj_t * lv_obj_t_id = lv_scale_create(lv_screen_active());
+    lv_obj_set_style_height(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_width(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_align(lv_obj_t_id, LV_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lv_obj_t_id, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_radius(lv_obj_t_id, LV_RADIUS_CIRCLE, 0);
+    lv_scale_set_mode(lv_obj_t_id, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_set_range(lv_obj_t_id, 0, 100);
+    lv_scale_set_angle_range(lv_obj_t_id, 180);
+    lv_scale_set_rotation(lv_obj_t_id, 270);
+    lv_scale_set_total_tick_count(lv_obj_t_id, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
+}
+
+/* When LV_STYLE_PAD_RADIAL is set on a section's main style, the section arc
+ * should be drawn with a radius reduced by the pad value. Two sections with
+ * adjacent ranges but with different radial paddings must therefore produce
+ * concentric arcs at distinct radii. */
+void test_scale_section_pad_radial(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 200, 200);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, false);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    /* Make the main arc visible so the section arcs can be visually distinguished. */
+    static lv_style_t main_arc_style;
+    lv_style_init(&main_arc_style);
+    lv_style_set_arc_color(&main_arc_style, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_arc_width(&main_arc_style, 2U);
+    lv_obj_add_style(scale, &main_arc_style, LV_PART_MAIN);
+
+    /* Section 1: no radial pad - the arc should sit on the default scale radius. */
+    static lv_style_t section_no_pad_style;
+    lv_style_init(&section_no_pad_style);
+    lv_style_set_arc_color(&section_no_pad_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_arc_width(&section_no_pad_style, 4U);
+
+    lv_scale_section_t * section_no_pad = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_no_pad, 0, 50);
+    lv_scale_set_section_style_main(scale, section_no_pad, &section_no_pad_style);
+
+    /* Section 2: radial pad of 20 - the section arc must be drawn 20 px inside. */
+    static lv_style_t section_padded_style;
+    lv_style_init(&section_padded_style);
+    lv_style_set_arc_color(&section_padded_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_arc_width(&section_padded_style, 4U);
+    lv_style_set_pad_radial(&section_padded_style, 20);
+
+    lv_scale_section_t * section_padded = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_padded, 50, 100);
+    lv_scale_set_section_style_main(scale, section_padded, &section_padded_style);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_10.png");
+}
+
+static lv_obj_t * create_self_size_scale(lv_obj_t * parent, lv_scale_mode_t mode)
+{
+
+    lv_obj_t * scale = lv_scale_create(parent);
+    switch(mode) {
+        case LV_SCALE_MODE_HORIZONTAL_TOP:
+        case LV_SCALE_MODE_HORIZONTAL_BOTTOM:
+            lv_obj_set_height(scale, LV_SIZE_CONTENT);
+            break;
+        case LV_SCALE_MODE_VERTICAL_LEFT:
+        case LV_SCALE_MODE_VERTICAL_RIGHT:
+            lv_obj_set_width(scale, LV_SIZE_CONTENT);
+            break;
+        default:
+            break;
+    }
+    lv_scale_set_mode(scale, mode);
+    lv_scale_set_label_show(scale, true);
+    lv_obj_set_style_outline_width(scale, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_width(scale, 2, LV_PART_MAIN);
+
+    return scale;
+}
+
+static lv_obj_t * set_tick_length(lv_obj_t * scale, int32_t major_len, int32_t minor_len)
+{
+    lv_obj_set_style_length(scale, minor_len, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, major_len, LV_PART_INDICATOR);
+    return scale;
+}
+
+void test_scale_self_size(void)
+{
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP);
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT);
+
+    lv_obj_t * scale = set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP), 30, 5);
+    lv_obj_set_flex_in_new_track(scale, true);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT), 30, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_self_size.png");
 }
 
 #endif

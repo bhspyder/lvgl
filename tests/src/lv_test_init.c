@@ -5,9 +5,6 @@
 #include <assert.h>
 #include "../unity/unity.h"
 
-#define HOR_RES 800
-#define VER_RES 480
-
 static void test_log_print_cb(lv_log_level_t level, const char * buf);
 
 void lv_test_init(void)
@@ -21,8 +18,16 @@ void lv_test_init(void)
     lv_profiler_builtin_set_enable(false);
 #endif
 
-    lv_test_display_create(HOR_RES, VER_RES);
+#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
+    lv_display_t * egl_disp = lv_test_display_egl_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
+    /* LV_ASSERT_MSG is always compiled in (unlike assert() under NDEBUG) and
+     * triggers LV_ASSERT_HANDLER, so a fatal setup failure is reported reliably. */
+    LV_ASSERT_MSG(egl_disp != NULL, "EGL headless display creation failed");
+#else
+    lv_test_display_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
+#endif
     lv_test_indev_create_all();
+    lv_test_fs_init();
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_test_indev_gesture_create();
@@ -30,10 +35,10 @@ void lv_test_init(void)
 
 #if LV_USE_SYSMON
 #if LV_USE_MEM_MONITOR
-    lv_sysmon_hide_memory(NULL);
+    lv_sysmon_hide_memory(lv_display_get_default());
 #endif
 #if LV_USE_PERF_MONITOR
-    lv_sysmon_hide_performance(NULL);
+    lv_sysmon_hide_performance(lv_display_get_default());
 #endif
 #endif
 }
@@ -44,7 +49,16 @@ void lv_test_deinit(void)
     lv_test_indev_gesture_delete();
 #endif
     lv_test_indev_delete_all();
+
+#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
+    /* Capture the EGL context before lv_deinit() deletes the display, then release
+     * the EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit. */
+    void * egl_ctx = lv_test_display_egl_get_context(lv_display_get_default());
     lv_deinit();
+    lv_test_display_egl_cleanup(egl_ctx);
+#else
+    lv_deinit();
+#endif
 }
 
 static void test_log_print_cb(lv_log_level_t level, const char * buf)

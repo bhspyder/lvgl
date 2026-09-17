@@ -1,9 +1,8 @@
 #ifndef __eglplatform_h_
 #define __eglplatform_h_
 
-#include "../../../lv_opengles_egl.h"
-
-#if LV_USE_EGL
+#include "../../../../../lvgl_public.h"
+#if LV_USE_OPENGLES
 
 /*
 ** Copyright 2007-2020 The Khronos Group Inc.
@@ -19,7 +18,7 @@
  * https://www.github.com/KhronosGroup/EGL-Registry/
  */
 
-#include <KHR/khrplatform.h>
+#include "../KHR/khrplatform.h"
 
 /* Macros used in EGL function prototype declarations.
  *
@@ -176,6 +175,5 @@ typedef khronos_int32_t EGLint;
 #define EGL_CAST(type, value) ((type) (value))
 #endif
 
-#endif /*LV_USE_EGL*/
-
+#endif /*LV_USE_OPENGLES*/
 #endif /* __eglplatform_h */

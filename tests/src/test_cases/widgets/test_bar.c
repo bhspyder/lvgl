@@ -570,4 +570,132 @@ void test_bar_orientation(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_2.png");
 }
 
+void test_bar_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_bar_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test VALUE property */
+    prop.id = LV_PROPERTY_BAR_VALUE;
+    prop.num = 50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(50, lv_obj_get_property(obj, LV_PROPERTY_BAR_VALUE).num);
+    TEST_ASSERT_EQUAL_INT(50, lv_bar_get_value(obj));
+
+    /* Test MIN_VALUE property */
+    prop.id = LV_PROPERTY_BAR_MIN_VALUE;
+    prop.num = 10;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(10, lv_obj_get_property(obj, LV_PROPERTY_BAR_MIN_VALUE).num);
+    TEST_ASSERT_EQUAL_INT(10, lv_bar_get_min_value(obj));
+
+    /* Test MAX_VALUE property */
+    prop.id = LV_PROPERTY_BAR_MAX_VALUE;
+    prop.num = 200;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(200, lv_obj_get_property(obj, LV_PROPERTY_BAR_MAX_VALUE).num);
+    TEST_ASSERT_EQUAL_INT(200, lv_bar_get_max_value(obj));
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_BAR_MODE;
+    prop.num = LV_BAR_MODE_RANGE;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_BAR_MODE_RANGE, lv_obj_get_property(obj, LV_PROPERTY_BAR_MODE).num);
+    TEST_ASSERT_EQUAL_INT(LV_BAR_MODE_RANGE, lv_bar_get_mode(obj));
+
+    /* Test START_VALUE property (only works in RANGE mode) */
+    prop.id = LV_PROPERTY_BAR_START_VALUE;
+    prop.num = 20;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(20, lv_obj_get_property(obj, LV_PROPERTY_BAR_START_VALUE).num);
+    TEST_ASSERT_EQUAL_INT(20, lv_bar_get_start_value(obj));
+
+    /* Test ORIENTATION property */
+    prop.id = LV_PROPERTY_BAR_ORIENTATION;
+    prop.num = LV_BAR_ORIENTATION_VERTICAL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_BAR_ORIENTATION_VERTICAL, lv_obj_get_property(obj, LV_PROPERTY_BAR_ORIENTATION).num);
+    TEST_ASSERT_EQUAL_INT(LV_BAR_ORIENTATION_VERTICAL, lv_bar_get_orientation(obj));
+
+    lv_obj_delete(obj);
+#endif
+}
+
+void test_bar_large_range_cur_value_no_overflow(void)
+{
+    /* Prevent int32 overflow when indic_w * (cur-min) > INT32_MAX */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 16000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    int32_t indic_w = lv_area_get_width(&ptr->indic_area);
+    TEST_ASSERT_TRUE(indic_w > 300);
+}
+
+void test_bar_large_range_start_value_no_overflow(void)
+{
+    /* Prevent int32 overflow for start_value pixel position */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_mode(g_bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 19000000, LV_ANIM_OFF);
+    lv_bar_set_start_value(g_bar, 12000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(ptr->indic_area.x1 > 200);
+}
+
+void test_bar_safe_values_preserved(void)
+{
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    int32_t indic_w = lv_area_get_width(&ptr->indic_area);
+    TEST_ASSERT_TRUE(indic_w > 30 && indic_w < 150);
+}
+
+void test_bar_large_range_cur_value_anim_no_overflow(void)
+{
+    /* Prevent int32 overflow during cur_value animation */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_refr_now(NULL);
+
+    lv_bar_set_value(g_bar, 14000000, LV_ANIM_ON);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(lv_area_get_width(&ptr->indic_area) > 300);
+}
+
+void test_bar_large_range_start_value_anim_no_overflow(void)
+{
+    /* Prevent int32 overflow during start_value animation */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_mode(g_bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 19000000, LV_ANIM_OFF);
+    lv_bar_set_start_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_refr_now(NULL);
+
+    lv_bar_set_start_value(g_bar, 10000000, LV_ANIM_ON);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(ptr->indic_area.x1 > 200);
+}
+
 #endif

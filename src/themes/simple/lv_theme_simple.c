@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_theme_private.h"
-#include "../../../lvgl.h" /*To see all the widgets*/
+
+#include "../../lvgl_public.h"
 
 #if LV_USE_THEME_SIMPLE
 
-#include "lv_theme_simple.h"
+#include "../lv_theme_private.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -159,6 +159,10 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
     theme->base.font_normal = LV_FONT_DEFAULT;
     theme->base.font_large = LV_FONT_DEFAULT;
     theme->base.apply_cb = theme_apply;
+#if LV_USE_EXT_DATA
+    theme->base.ext_data.free_cb = NULL;
+    theme->base.ext_data.data = NULL;
+#endif
 
     style_init(theme);
 
@@ -198,6 +202,12 @@ void lv_theme_simple_deinit(void)
                 lv_style_reset(theme_styles + i);
             }
         }
+#if LV_USE_EXT_DATA
+        if(theme->base.ext_data.free_cb) {
+            theme->base.ext_data.free_cb(theme->base.ext_data.data);
+            theme->base.ext_data.data = NULL;
+        }
+#endif
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -222,13 +232,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
+        lv_obj_t * grandparent = lv_obj_get_parent(parent);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.scr, 0);
             return;
         }
         /*Tabview pages*/
-        else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+        else if(grandparent && lv_obj_check_type(grandparent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.scr, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
             return;

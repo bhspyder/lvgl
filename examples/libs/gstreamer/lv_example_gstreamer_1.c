@@ -9,7 +9,7 @@ typedef struct {
     lv_obj_t * button_label;
     lv_obj_t * position_label;
     lv_obj_t * duration_label;
-    lv_subject_t position_subject;
+    lv_subject_t * position_subject;
 } event_data_t;
 
 static void volume_setter_create(event_data_t * event_data);
@@ -18,10 +18,22 @@ static void update_duration_label(lv_obj_t * label, uint32_t duration);
 static void volume_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void update_position_slider(lv_timer_t * timer);
 static void play_pause_pressed(lv_event_t * e);
-static void streamer_ready(lv_event_t * e);
+static void stream_state_changed(lv_event_t * e);
 
 /**
- * Loads a video from the internet using the gstreamer widget
+ * @title GStreamer URI player with controls
+ * @brief Stream a WebM clip over HTTPS with a custom play/pause button and position slider.
+ *
+ * `lv_gstreamer_create` opens the Sintel trailer through
+ * `LV_GSTREAMER_FACTORY_URI_DECODE` and `LV_GSTREAMER_PROPERTY_URI_DECODE`.
+ * A side column binds a volume slider and label to an `lv_subject_t` that
+ * forwards new values to `lv_gstreamer_set_volume`. A bottom bar holds a
+ * position label, a play/pause button whose label switches between
+ * `LV_SYMBOL_PLAY`, `LV_SYMBOL_PAUSE`, and `LV_SYMBOL_REFRESH`, an
+ * `lv_bar` bound to a position subject, and a duration label.
+ * `LV_EVENT_STATE_CHANGED` updates the duration text when the stream
+ * starts, and a timer running at `LV_DEF_REFR_PERIOD` polls
+ * `lv_gstreamer_get_position` to update the seek bar.
  */
 void lv_example_gstreamer_1(void)
 {
@@ -40,18 +52,15 @@ void lv_example_gstreamer_1(void)
      * specify various URI schemes as media sources including local files (file://),
      * web streams (http://, https://), RTSP streams (rtsp://), UDP streams (udp://),
      * and many others. GStreamer's uridecodebin automatically selects the appropriate
-     * source element and decoder based on the URI scheme and media format. */
+     * source element and decoder based on the URI scheme and media format.
+     * WebRTC streams, however, are provided via a dedicated WebRTC source (webrtcsrc)
+     * configured with a signalling server URI (e.g. ws://[ipsignallerserver]:[port])
+     * through its signaller-related properties, rather than via LV_GSTREAMER_FACTORY_URI_DECODE.
+     */
     lv_gstreamer_set_src(event_data.streamer, LV_GSTREAMER_FACTORY_URI_DECODE, LV_GSTREAMER_PROPERTY_URI_DECODE,
                          "https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm");
 
     lv_obj_center(event_data.streamer);
-
-    /* The LV_EVENT_READY will fire when the stream is ready at that point you can query the stream
-     * information like its resolution and duration. See `streamer_ready` */
-    lv_obj_add_event_cb(event_data.streamer, streamer_ready, LV_EVENT_READY, &event_data);
-
-    /* Play the stream immediately */
-    lv_gstreamer_play(event_data.streamer);
 
     /* Create a slider to modify the stream volume and a label to visualize the current value */
     volume_setter_create(&event_data);
@@ -60,6 +69,13 @@ void lv_example_gstreamer_1(void)
      * One for the current position in the stream and the other for the total duration of the stream
      * Also add a pause/play button*/
     control_bar_create(&event_data);
+
+    /* The LV_EVENT_STATE_CHANGED will fire when the stream is ready at that point we can query the stream
+     * information like its resolution and duration. See `streamer_ready` */
+    lv_obj_add_event_cb(event_data.streamer, stream_state_changed, LV_EVENT_STATE_CHANGED, &event_data);
+
+    /* Play the stream immediately */
+    lv_gstreamer_play(event_data.streamer);
 
     /* Create a timer that will update the slider position based on the stream position
      * Make it 3 times faster than the refresh rate for a smoother effect */
@@ -90,18 +106,18 @@ static void volume_setter_create(event_data_t * event_data)
 
     /* We use `lv_subject` to simplify binding the data between multiple objects.
      * Here the data is shared between the slider, the label and the gstreamer widgets */
-    static lv_subject_t volume_subject;
-    lv_subject_init_int(&volume_subject, 50);
-    lv_subject_add_observer_obj(&volume_subject, volume_observer_cb, event_data->streamer, NULL);
-    lv_slider_bind_value(volume_slider, &volume_subject);
-    lv_label_bind_text(volume_label, &volume_subject, LV_SYMBOL_VOLUME_MID "\n%3" LV_PRId32 "%%");
+    lv_subject_t * volume_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(volume_subject, 50);
+    lv_subject_add_observer_obj(volume_subject, volume_observer_cb, event_data->streamer, NULL);
+    lv_slider_bind_value(volume_slider, volume_subject);
+    lv_label_bind_text(volume_label, volume_subject, LV_SYMBOL_VOLUME_MID "\n%3" LV_PRId32 "%%");
 
 }
 
 
 static void control_bar_create(event_data_t * event_data)
 {
-    lv_subject_init_int(&event_data->position_subject, 0);
+    event_data->position_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
 
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(cont);
@@ -131,7 +147,7 @@ static void control_bar_create(event_data_t * event_data)
     lv_obj_t * position_slider = lv_bar_create(cont);
     lv_bar_set_range(position_slider, 0, 1000);
     lv_obj_set_flex_grow(position_slider, 1);
-    lv_slider_bind_value(position_slider, &event_data->position_subject);
+    lv_slider_bind_value(position_slider, event_data->position_subject);
 
     event_data->duration_label = lv_label_create(cont);
     lv_obj_set_width(event_data->duration_label, 80);
@@ -164,7 +180,7 @@ static void update_position_slider(lv_timer_t * timer)
     uint32_t duration = lv_gstreamer_get_duration(event_data->streamer);
     uint32_t position = lv_gstreamer_get_position(event_data->streamer);
     int32_t position_perc = lv_map(position, 0, duration, 0, 1000);
-    lv_subject_set_int(&event_data->position_subject, position_perc);
+    lv_subject_set_int(event_data->position_subject, position_perc);
     update_duration_label(event_data->position_label, position);
 }
 
@@ -173,30 +189,52 @@ static void play_pause_pressed(lv_event_t * e)
 {
     event_data_t * event_data = (event_data_t *)lv_event_get_user_data(e);
 
-    if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_PLAY)) {
-        lv_label_set_text(event_data->button_label, LV_SYMBOL_PAUSE);
+    if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_REFRESH)) {
+        lv_gstreamer_set_position(event_data->streamer, 0);
+        lv_gstreamer_play(event_data->streamer);
+    }
+    else if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_PLAY)) {
         lv_gstreamer_play(event_data->streamer);
     }
     else {
-        lv_label_set_text(event_data->button_label, LV_SYMBOL_PLAY);
         lv_gstreamer_pause(event_data->streamer);
     }
 }
-static void streamer_ready(lv_event_t * e)
+static void stream_state_changed(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     event_data_t * event_data = (event_data_t *)lv_event_get_user_data(e);
-    lv_obj_t * btn = event_data->pp_button;
+
     lv_obj_t * streamer = event_data->streamer;
 
-    if(code == LV_EVENT_READY) {
-        lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, 0);
-        uint32_t duration = lv_gstreamer_get_duration(streamer);
-        LV_LOG_USER("Video is starting");
-        LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
-                    lv_image_get_src_height(streamer));
-        LV_LOG_USER("\tStream duration %" LV_PRIu32, duration);
-        update_duration_label(event_data->duration_label, duration);
+    if(code != LV_EVENT_STATE_CHANGED) {
+        return;
+    }
+
+    lv_gstreamer_stream_state_t stream_state = lv_gstreamer_get_stream_state(e);
+    switch(stream_state) {
+        case LV_GSTREAMER_STREAM_STATE_START: {
+                uint32_t duration = lv_gstreamer_get_duration(streamer);
+                LV_LOG_USER("Stream is starting");
+                LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
+                            lv_image_get_src_height(streamer));
+                LV_LOG_USER("\tStream duration %" LV_PRIu32, duration);
+                update_duration_label(event_data->duration_label, duration);
+                break;
+            }
+        case LV_GSTREAMER_STREAM_STATE_END:
+            LV_LOG_USER("Stream is over");
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_REFRESH);
+            break;
+        case LV_GSTREAMER_STREAM_STATE_PLAY:
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PAUSE);
+            break;
+        case LV_GSTREAMER_STREAM_STATE_PAUSE:
+        case LV_GSTREAMER_STREAM_STATE_STOP:
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PLAY);
+            break;
+        case LV_GSTREAMER_STREAM_STATE_INVALID:
+            break;
     }
 }
 
