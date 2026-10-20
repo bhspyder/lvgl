@@ -106,11 +106,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
         /*With a loader the bitmap is read into a scratch buffer which is overwritten by the next
          *glyph, so the returned pointer is only valid until then. Such fonts have
          *`static_bitmap == 0` which tells the draw units not to hold on to the pointer.*/
-#ifdef FW_ETHERNET_BUILD
-        const uint8_t * raw = GUI_DATA_OFFSET_PTR(glyph_bitmap_acquire(fdsc, gdsc, gid));
-#else
-        const uint8_t * raw = glyph_bitmap_acquire(fdsc, gdsc, gid);
-#endif
+    	const uint8_t * raw = LV_DATA_OFFSET_PTR(glyph_bitmap_acquire(fdsc, gdsc, gid));
         if(raw == NULL) return NULL;
 
         glyph_bitmap_release(fdsc);
@@ -127,11 +123,8 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         LV_ASSERT_FORMAT_MSG(fdsc->bpp == 1 || fdsc->bpp == 2 || fdsc->bpp == 4 || fdsc->bpp == 8, "bpp was %d", fdsc->bpp);
-#ifdef FW_ETHERNET_BUILD
-        const uint8_t * bitmap_in = GUI_DATA_OFFSET_PTR(glyph_bitmap_acquire(fdsc, gdsc, gid));
-#else
-        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
-#endif
+
+        const uint8_t * bitmap_in = LV_DATA_OFFSET_PTR(glyph_bitmap_acquire(fdsc, gdsc, gid));
         if(bitmap_in == NULL) return NULL;
 
         uint8_t * bitmap_out_tmp = bitmap_out;

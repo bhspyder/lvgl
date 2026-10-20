@@ -550,13 +550,8 @@ lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * i
     LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(img != NULL, return LV_RESULT_INVALID);
     
-#ifdef FW_ETHERNET_BUILD
     const lv_result_t res = lv_draw_buf_init(buf, img->header.w, img->header.h, img->header.cf, img->header.stride,
-    										 GUI_DATA_OFFSET_PTR((void *)img->data), img->data_size);
-#else
-    const lv_result_t res = lv_draw_buf_init(buf, img->header.w, img->header.h, img->header.cf, img->header.stride,
-                                             (void *)img->data, img->data_size);
-#endif
+    										 LV_DATA_OFFSET_PTR((void *)img->data), img->data_size);
     if(res != LV_RESULT_OK) {
         return res;
     }

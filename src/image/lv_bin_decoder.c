@@ -478,11 +478,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         }
         else {
             const lv_image_dsc_t * image = dsc->src;
-#ifdef FW_ETHERNET_BUILD
-            buf = (void *)((GUI_DATA_OFFSET_PTR(image->data)) + offset);
-#else
-            buf = (void *)(image->data + offset);
-#endif
+            buf = (void *)((LV_DATA_OFFSET_PTR(image->data)) + offset);
         }
 
         decode_indexed_line(cf, dsc->palette, x_fraction, w_px, buf, (lv_color32_t *)img_data);
@@ -641,11 +637,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     }
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
-#ifdef FW_ETHERNET_BUILD
-        const uint8_t * image_data = (GUI_DATA_OFFSET_PTR(image->data));
-#else
-        const uint8_t * image_data = image->data;
-#endif
+        const uint8_t * image_data = (LV_DATA_OFFSET_PTR(image->data));
         palette = (lv_color32_t *)image_data;
         indexed_data = image_data + palette_len;
     }
